@@ -1,0 +1,73 @@
+﻿<UserControl x:Class="ModernAudioTagger.Content.ContentBottomList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:blogic="clr-namespace:ModernAudioTagger.BusinessLogic"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"
+             xmlns:converter="clr-namespace:ModernAudioTagger.Converter"
+             xmlns:mscorelib="clr-namespace:System;assembly=mscorlib"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"                
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"                   
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+
+    <UserControl.Resources>
+        <blogic:DataContextSpy x:Key="spyMusicDbVM" DataContext="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MusicDbVM }"></blogic:DataContextSpy>
+        <blogic:DataContextSpy x:Key="spyTrackTagVM" DataContext="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM }"></blogic:DataContextSpy>
+        <blogic:DataContextSpy x:Key="spyLocalSystemVM" DataContext="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM }"></blogic:DataContextSpy>
+        <converter:DataGridRowIndexConverter x:Key="indexConverter" />
+        <converter:FilenameConverter x:Key="filenameConverter" />        
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="3"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        
+        <!-- DB RESULT DATAGRIG -->
+        <DataGrid FontSize="{StaticResource SmallFontSize}" ItemsSource="{Binding Source={StaticResource spyMusicDbVM}, Path=DataContext.ListDbResult}" IsReadOnly="True" AutoGenerateColumns="False" SelectedItem="{Binding Source={StaticResource spyTrackTagVM}, Path=DataContext.SelectedTagTrack, Mode=TwoWay}">
+            <DataGrid.Columns>
+                <mui:DataGridCheckBoxColumn Binding="{Binding IsSelected}" />
+                <mui:DataGridTextColumn Header="#" Binding="{Binding Track}" />
+                <mui:DataGridTextColumn Header="Title" Binding="{Binding Title}"/>
+            </DataGrid.Columns>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding Source={StaticResource spyTrackTagVM}, Path=DataContext.UpdateEditTagTrackCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </DataGrid>
+        
+        <GridSplitter Grid.Column="1" />
+
+        <!-- FILE LIST DATAGRID -->
+        <DataGrid FontSize="{StaticResource SmallFontSize}" ItemsSource="{Binding Source={StaticResource spyLocalSystemVM}, Path=DataContext.Files}" IsReadOnly="True" AutoGenerateColumns="False" SelectedItem="{Binding Source={StaticResource spyTrackTagVM}, Path=DataContext.SelectedFile, Mode=TwoWay}" Grid.Column="2">
+            <DataGrid.Columns>
+                <mui:DataGridCheckBoxColumn Binding="{Binding IsSelected}" />
+                <mui:DataGridTextColumn Header="#" Width="25">
+                    <mui:DataGridTextColumn.Binding>
+                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}">
+                            <Binding.Converter>
+                                <converter:DataGridRowIndexConverter />
+                            </Binding.Converter>
+                            <Binding.ConverterParameter>
+                                <mscorelib:Boolean>True</mscorelib:Boolean>
+                            </Binding.ConverterParameter>
+                        </Binding>
+                    </mui:DataGridTextColumn.Binding>
+                </mui:DataGridTextColumn>
+                <mui:DataGridTextColumn Header="Name" Binding="{Binding FileName, Converter={StaticResource filenameConverter}}"/>
+            </DataGrid.Columns>            
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding Source={StaticResource spyTrackTagVM}, Path=DataContext.UpdateEditTagFileCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </DataGrid>
+    </Grid>
+
+</UserControl>

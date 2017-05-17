@@ -1,0 +1,158 @@
+﻿<UserControl x:Class="ModernAudioTagger.Content.ContentLeftDbResult"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"
+             xmlns:converter="clr-namespace:ModernAudioTagger.Converter"
+             xmlns:helper="clr-namespace:ModernAudioTagger.Helpers"
+             xmlns:mscorelib="clr-namespace:System;assembly=mscorlib"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"                
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"                   
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.DataContext>
+        <Binding Source="{x:Static provider:ViewModelLocator.Instance}" Path="MusicDbVM" />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <converter:IsEqualOrGreaterThanConverter x:Key="isEqualOrGreaterThanConverter" />
+        <converter:TrackLengthConverter x:Key="lengthConverter" />
+    </UserControl.Resources>
+
+    <Border
+        BorderThickness="1"
+        BorderBrush="{DynamicResource SeparatorBackground}"
+        >
+        <DockPanel>
+
+            <Grid DockPanel.Dock="Left" Margin="{StaticResource DefaultMargin}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+
+                <StackPanel VerticalAlignment="Center">
+                    <mui:ModernButton IconData="{StaticResource arrowLeftPathData}" RenderTransformOrigin="0.5,0.5" CommandParameter="{Binding SelectedDbResult}" Command="{Binding MoveTrackUpCommand}">
+                        <mui:ModernButton.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="90"/>
+                            </TransformGroup>
+                        </mui:ModernButton.RenderTransform>
+                    </mui:ModernButton>
+                    <mui:ModernButton IconData="{StaticResource arrowLeftPathData}" RenderTransformOrigin="0.5,0.5" Margin="{StaticResource DefaultTopMargin}" CommandParameter="{Binding SelectedDbResult}" Command="{Binding MoveTrackDownCommand}">
+                        <mui:ModernButton.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="270"/>
+                            </TransformGroup>
+                        </mui:ModernButton.RenderTransform>
+                    </mui:ModernButton>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                    <mui:ModernButton IconData="{StaticResource alphabeticalDescPathData}" Command="{Binding OrderTracksByNameCommand}"></mui:ModernButton>
+                    <mui:ModernButton IconData="{StaticResource numericDescPathData}" Margin="{StaticResource DefaultTopMargin}" Command="{Binding OrderTracksByNumberCommand}"></mui:ModernButton>
+                </StackPanel>
+
+            </Grid>
+
+            <StackPanel HorizontalAlignment="Center" DockPanel.Dock="Top">
+                <StackPanel.Style>
+                    <Style TargetType="{x:Type StackPanel}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ListDbResult.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock HorizontalAlignment="Center">List is empty</TextBlock>
+                <mui:BBCodeBlock BBCode="[url=/Pages/MusicDbSearch.xaml]Click here[/url]" Margin="0, 5, 0, 0" HorizontalAlignment="Center"></mui:BBCodeBlock>
+            </StackPanel>
+
+            <ListView
+                FontSize="{StaticResource SmallFontSize}" 
+                ItemsSource="{Binding ListDbResult}" 
+                SelectionMode="Extended"    
+                VirtualizingStackPanel.IsVirtualizing="False"
+                helper:ListBoxMultipleSelectorHelper.SelectedItems="{Binding SelectedDbResult, Mode=TwoWay}"            
+                >
+
+                <ListView.Style>
+                    <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListView}}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ListDbResult.Count, Converter={StaticResource isEqualOrGreaterThanConverter}, ConverterParameter='1'}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.Style>
+
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Check selected" Command="{Binding CheckSelectedItemsCommand}"></MenuItem>
+                        <MenuItem Header="Check/Uncheck all" Command="{Binding CheckAllItemsCommand}"></MenuItem>
+                        <Separator />
+                        <MenuItem Header="Order by matching name" Command="{Binding OrderTracksByNameCommand}"></MenuItem>
+                        <MenuItem Header="Order by matching number" Command="{Binding OrderTracksByNumberCommand}"></MenuItem>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.InputBindings>
+                    <KeyBinding Key="Space" Command="{Binding CheckSelectedItemsCommand}" />
+                </ListView.InputBindings>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="30">      
+                            <GridViewColumnHeader Command="{Binding CheckAllItemsCommand}">
+                                <GridViewColumnHeader.Content>
+                                    <Path Stretch="Uniform" Width="16" Fill="#FF000000"  Data="{StaticResource checkPathData}" />
+                                </GridViewColumnHeader.Content>
+                            </GridViewColumnHeader>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Stretch">
+                                        <CheckBox 
+                                            IsChecked="{Binding IsSelected, Mode=TwoWay}" 
+                                            >                                        
+                                            <i:Interaction.Triggers>                                            
+                                                <i:EventTrigger EventName="Checked">
+                                                    <i:InvokeCommandAction Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MusicDbVM.CheckSelectionChangedCommand}" CommandParameter="{Binding}" />                                                
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="Unchecked">
+                                                    <i:InvokeCommandAction Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MusicDbVM.CheckSelectionChangedCommand}" CommandParameter="{Binding}" />                                                
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonDown" >
+                                                    <i:InvokeCommandAction Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MusicDbVM.ExlusiveSelectItemCommand}" CommandParameter="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </CheckBox>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Track, StringFormat='00'}">
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MusicDbVM.OrderTracksByPositionCommand}">#</GridViewColumnHeader>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Title" DisplayMemberBinding="{Binding Title}" />
+                        <GridViewColumn Header="Length" DisplayMemberBinding="{Binding Length, Converter={StaticResource lengthConverter}}" />
+                    </GridView>
+                </ListView.View>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.ShowTrackTagCommand}" CommandParameter="{Binding SelectedDbResult}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListView>
+
+            
+
+        </DockPanel>
+    </Border>
+</UserControl>

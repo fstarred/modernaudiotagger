@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="ModernAudioTagger.Pages.ExplorerPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:content="clr-namespace:ModernAudioTagger.Content"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"
+             xmlns:view="clr-namespace:ModernAudioTagger.View"
+             xmlns:explorer="clr-namespace:WpfExplorerTree;assembly=WpfExplorerTree"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"                
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"                                             
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.DataContext>
+        <Binding Source="{x:Static provider:ViewModelLocator.Instance}" Path="LocalSystemVM" />
+    </UserControl.DataContext>
+
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom">
+
+            <!-- content root for additional spacing -->
+            <Grid Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="3" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" >
+                        <mui:ModernButton ToolTip="Change working folder" EllipseDiameter="24" IconWidth="16" IconHeight="16" IconData="{StaticResource openFolderPathData}" Command="{Binding OpenFolderDialogCommand}"  />
+                        <!--<Line Y1="0" Y2="24" Stroke="{DynamicResource SeparatorBackground}" Margin="{StaticResource LineMenuSeparator}"></Line>-->
+                        <!--<mui:ModernButton EllipseDiameter="24" IconWidth="16" IconHeight="16" IconData="{StaticResource folderPathData}" Command="{x:Static view:ViewCommands.OpenFolderLocation}" CommandParameter="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM.SelectedPath}" Margin="{StaticResource DefaultLeftMargin}"  />-->
+                    </StackPanel>
+
+                    <!-- right panel -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Column="2">
+                        <mui:ModernButton ToolTip="Refresh folder content" EllipseDiameter="24" IconWidth="16" IconHeight="16" IconData="{StaticResource refreshPathData}" Command="{Binding RefreshFilelistCommand}" Margin="{StaticResource DefaultLeftMargin}"  />
+                    </StackPanel>
+                    <!--<StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
+                        <mui:ModernButton 
+                            ToolTip="Help online"
+                            Command="{x:Static view:ViewCommands.OpenUrl}" 
+                            CommandParameter="{StaticResource doc_manualtag}"
+                            EllipseDiameter="24" IconWidth="16" IconHeight="16"                           
+                            HorizontalAlignment="Right"
+                            Margin="{StaticResource DefaultRightMargin}"
+                            IconData="{StaticResource helpPathData}"
+                        />
+                    </StackPanel>-->
+
+                    <explorer:TreeExplorer Grid.Column="0" Grid.Row="1" Margin="{StaticResource SplitLeft}" SelectedPath="{Binding SelectedPath}" />
+                    <GridSplitter Grid.Column="1" Grid.Row="1" />
+                    <content:ContentFileList Grid.Row="1" Grid.Column="2" Margin="{StaticResource SplitRight}" />
+
+                </Grid>
+
+                <!-- optional status -->
+                <Grid Grid.Row="1" Margin="{StaticResource StatusMargin}" >
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <TextBlock Margin="{StaticResource DefaultLeftMargin}" Text="{Binding Status}" />
+                        <Canvas x:Name="canvas_alert" Margin="{StaticResource DefaultLeftMargin}" Width="20" Height="20" VerticalAlignment="Bottom" Visibility="Hidden">
+                            <Path Fill="#FF000000" Stretch="Uniform" Width="16" Height="16" Data="{StaticResource alertPathData}" />
+                        </Canvas>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DataContext="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MainVM}" x:Name="mediastatus" Visibility="Hidden">
+                        <TextBlock Text="{Binding PlayingFile}" />
+                        <mui:ModernButton VerticalAlignment="Top" EllipseDiameter="16" IconWidth="8" IconHeight="8" IconData="{StaticResource stopPathData}" x:Name="path_mediastatus" Command="{Binding StopFileCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </DockPanel>
+
+    <i:Interaction.Triggers>
+
+        <i:EventTrigger EventName="OnMediaPlayEvent" SourceObject="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MainVM}">
+            <ei:ChangePropertyAction TargetName="mediastatus" PropertyName="Visibility" Value="Visible" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="OnMediaStopEvent" SourceObject="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MainVM}">
+            <ei:ChangePropertyAction TargetName="mediastatus" PropertyName="Visibility" Value="Hidden" />
+        </i:EventTrigger>        
+    </i:Interaction.Triggers>
+</UserControl>

@@ -1,0 +1,32 @@
+﻿<Application x:Class="ModernAudioTagger.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml"
+             xmlns:vm="clr-namespace:ModernAudioTagger.ViewModel"
+             xmlns:system="clr-namespace:System;assembly=System"
+             xmlns:mscorelib="clr-namespace:System;assembly=mscorlib"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"
+             >
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.xaml" />
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Light.xaml"/>
+                <ResourceDictionary Source="Assets/custom_resource.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <system:Uri x:Key="apphomepage">http://modernaudiotagger.codeplex.com</system:Uri>
+            <system:Uri x:Key="appdocumentationpage">http://modernaudiotagger.codeplex.com/documentation</system:Uri>
+
+            <mscorelib:String x:Key="app_title">Modern Audio Tagger</mscorelib:String>
+            <mscorelib:String x:Key="updateuri">http://dl.dropboxusercontent.com/u/55285635/modernaudiotagger.xml</mscorelib:String>
+
+            <mscorelib:String x:Key="doc_dbsearch">http://modernaudiotagger.codeplex.com/documentation#DatabaseSearch</mscorelib:String>
+            <mscorelib:String x:Key="doc_manualtag">http://modernaudiotagger.codeplex.com/documentation#ManualTag</mscorelib:String>
+            <mscorelib:String x:Key="doc_autotag">http://modernaudiotagger.codeplex.com/documentation#AutomaticTag</mscorelib:String>
+            <mscorelib:String x:Key="doc_rename">http://modernaudiotagger.codeplex.com/documentation#Rename</mscorelib:String>
+            <mscorelib:String x:Key="doc_batch">http://modernaudiotagger.codeplex.com/documentation#BatchHelper</mscorelib:String>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

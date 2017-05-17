@@ -1,0 +1,273 @@
+﻿<UserControl x:Class="ModernAudioTagger.Content.ContentMusicDbSearch"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"
+             xmlns:converter="clr-namespace:ModernAudioTagger.Converter"
+             xmlns:mscorelib="clr-namespace:System;assembly=mscorlib"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"                
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"      
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="600"             
+             >
+
+    <UserControl.DataContext>
+        <Binding Source="{x:Static provider:ViewModelLocator.Instance}" Path="MusicDbVM" />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <converter:EnumMatchToBooleanConverter x:Key="enumConverter" />
+        <converter:IsEqualOrGreaterThanConverter x:Key="isEqualOrGreaterThanConverter" />
+        <converter:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
+        <mscorelib:Double x:Key="text_width" >200</mscorelib:Double>
+        <!--<Style x:Key="{x:Type ToolTip}" TargetType="ToolTip">
+            <Setter Property="OverridesDefaultStyle"
+          Value="true" />
+            <Setter Property="HasDropShadow"
+          Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <Border Name="Border"
+                BorderThickness="1"
+                Width="{TemplateBinding Width}"
+                Height="{TemplateBinding Height}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0"
+                                 EndPoint="0,1">
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStopCollection>
+                                            <GradientStop Color="{DynamicResource ControlLightColor}"
+                                Offset="0.0" />
+                                            <GradientStop Color="{DynamicResource ControlMediumColor}"
+                                Offset="1.0" />
+                                        </GradientStopCollection>
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+
+                            </Border.Background>
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource BorderMediumColor}" />
+                            </Border.BorderBrush>
+                            <ContentPresenter Margin="4"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasDropShadow"
+                   Value="true">
+                                <Setter TargetName="Border"
+                    Property="CornerRadius"
+                    Value="4" />
+                                <Setter TargetName="Border"
+                    Property="SnapsToDevicePixels"
+                    Value="true" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>-->
+    </UserControl.Resources>
+
+    <StackPanel Margin="{StaticResource DefaultTopMargin}">
+
+        <Grid>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <!-- ROW 0 -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.ColumnSpan="3" Margin="{StaticResource DefaultTopMargin}">
+                <RadioButton       
+                        Width="80"
+                        x:Name="rb_lastfm"
+                        IsChecked="{Binding Path=SelectedDb, Mode=TwoWay, 
+                                     Converter={StaticResource enumConverter},
+                                     ConverterParameter=LASTFM}" 
+                        Margin="{StaticResource DefaultRightMargin}" 
+                        Style="{StaticResource {x:Type ToggleButton}}">
+                    <Image Source="/Assets/lastfm.png" Stretch="None" />
+                </RadioButton>
+                <RadioButton 
+                        Width="80"
+                        x:Name="rb_mbrainz"
+                        IsChecked="{Binding Path=SelectedDb, Mode=TwoWay, 
+                                         Converter={StaticResource enumConverter},
+                                         ConverterParameter=MUSICBRAINZ}"  
+                        Style="{StaticResource {x:Type ToggleButton}}">
+                    <Image Source="/Assets/music_brainz.png" Stretch="None"  />
+                </RadioButton>
+            </StackPanel>
+
+            <!-- ROW 1 -->
+            <TextBlock FontSize="{StaticResource SmallFontSize}" VerticalAlignment="Center" Style="{StaticResource Heading2}" Margin="{StaticResource DefaultMargin}" HorizontalAlignment="Left" Grid.Row="1">SERVICE</TextBlock>
+            <TextBox 
+                FontSize="{StaticResource SmallFontSize}"
+                VerticalAlignment="Center" 
+                HorizontalContentAlignment="Center" 
+                IsReadOnly="True" 
+                Width="{StaticResource text_width}"
+                Margin="{StaticResource DefaultMargin}" 
+                HorizontalAlignment="Center" 
+                Grid.Column="1" Grid.Row="1">
+                <TextBox.Style>
+                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=rb_lastfm, Path=IsChecked}" Value="True">
+                                <Setter Property="Text" Value="LAST.FM"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ElementName=rb_mbrainz, Path=IsChecked}" Value="True">
+                                <Setter Property="Text" Value="MUSICBRAINZ"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+
+            <!-- ROW 2 -->
+            <TextBlock FontSize="{StaticResource SmallFontSize}" VerticalAlignment="Center" Style="{StaticResource Heading2}" Margin="{StaticResource DefaultMargin}" HorizontalAlignment="Left" Grid.Row="2">TRACK</TextBlock>
+            <ComboBox           
+                    x:Name="cb_selectedtrack"
+                    FontSize="{StaticResource SmallFontSize}"
+                    SelectedItem="{Binding SelectedTrackFilter, Mode=TwoWay}"
+                    DisplayMemberPath="Title"
+                    ItemsSource="{Binding ListTrackFilter, Mode=TwoWay}" 
+                    Text="{Binding Path=ManualTitleFilter, Mode=TwoWay}" 
+                    IsTextSearchEnabled="True"
+                    IsEditable="True"                         
+                    Grid.Column="1" Grid.Row="2"              
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}" 
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction CommandParameter="{Binding ElementName=cb_selectedtrack, Path=SelectedItem}" Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.ShowSingleTrackTagCommand}"></i:InvokeCommandAction>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
+            <Button ToolTip="Search for track information" HorizontalAlignment="Left" Width="30" VerticalAlignment="Center" Height="24" Grid.Column="2" Grid.Row="2" Margin="{StaticResource DefaultMargin}" Command="{Binding GetTrackCommand}">
+                <Button.Content>
+                    <Canvas >
+                        <Path Canvas.Left="-8" Canvas.Top="-6" Width="14" Stretch="Uniform" Fill="#FF000000" Data="{StaticResource searchPathData}"/>
+                    </Canvas>
+                </Button.Content>
+            </Button>
+            <Button ToolTip="Clear track search field" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="30" Grid.Column="3" Grid.Row="2" Margin="{StaticResource DefaultMargin}" Command="{Binding ClearTracklistCommand}">
+                <Button.Content>
+                    <Canvas>
+                        <Path Canvas.Left="-10" Canvas.Top="-5" Width="16" Stretch="Uniform" Fill="#FF000000" Data="{StaticResource clearPathData}" />
+                    </Canvas>
+                </Button.Content>
+            </Button>
+
+            <!-- ROW 3 -->
+            <TextBlock FontSize="{StaticResource SmallFontSize}" VerticalAlignment="Center" Grid.Row="3" Style="{StaticResource Heading2}" Margin="{StaticResource DefaultMargin}" HorizontalAlignment="Left">ARTIST</TextBlock>
+            <TextBox 
+                    FontSize="{StaticResource SmallFontSize}"
+                    Text="{Binding Path=ManualArtistFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"                     
+                    VerticalAlignment="Center" 
+                    Grid.Row="3" Grid.Column="1" 
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}" 
+                    HorizontalAlignment="Left"
+                    >
+            </TextBox>
+            <StackPanel Grid.Column="2" Grid.Row="3" Margin="{StaticResource DefaultMargin}">
+                <Button ToolTip="Search tracks for this artist" HorizontalAlignment="Left" Width="30" Height="20" Command="{Binding SearchArtistTrackListCommand}">
+                    <Button.Content>
+                        <Canvas>
+                            <Path Width="10" Canvas.Left="-8" Canvas.Top="-4" Stretch="Uniform" Fill="#FF000000" Data="{StaticResource arrowLeftPathData}" RenderTransformOrigin="0.5,0.5">
+                                <Path.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform/>
+                                        <SkewTransform/>
+                                        <RotateTransform Angle="90"/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Path.RenderTransform>
+                            </Path>
+                        </Canvas>
+                    </Button.Content>
+                </Button>
+                <Button ToolTip="Search releases for this artist" HorizontalAlignment="Left" Width="30" Command="{Binding SearchArtistReleaseListCommand}" VerticalAlignment="Center" Height="20">
+                    <Button.Content>
+                        <Canvas>
+                            <Path Width="10" Canvas.Left="-8" Canvas.Top="-4" Stretch="Uniform" Fill="#FF000000" Data="{StaticResource arrowLeftPathData}" RenderTransformOrigin="0.5,0.5">
+                                <Path.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform/>
+                                        <SkewTransform/>
+                                        <RotateTransform Angle="-90"/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Path.RenderTransform>
+                            </Path>
+                        </Canvas>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+
+            <!-- ROW 4 -->
+            <TextBlock FontSize="{StaticResource SmallFontSize}" VerticalAlignment="Center" Grid.Row="4" Style="{StaticResource Heading2}" Margin="{StaticResource DefaultMargin}" HorizontalAlignment="Left">ALBUM</TextBlock>
+
+            <ComboBox            
+                    x:Name="cb_selectedrelease"
+                    FontSize="{StaticResource SmallFontSize}"
+                    SelectedItem="{Binding SelectedReleaseFilter, Mode=TwoWay}"
+                    ItemsSource="{Binding ListReleaseFilter, Mode=TwoWay}" 
+                    DisplayMemberPath="Title"
+                    Text="{Binding Path=ManualReleaseFilter, Mode=TwoWay}" 
+                    IsTextSearchEnabled="True"
+                    IsEditable="True"                     
+                    Grid.Row="4" Grid.Column="1" 
+                    VerticalAlignment="Center"                     
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}" 
+                    HorizontalAlignment="Left"             
+                    >
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction CommandParameter="{Binding ElementName=cb_selectedrelease, Path=SelectedItem}" Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.ShowReleaseTagCommand}"></i:InvokeCommandAction>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
+            <Button ToolTip="Search for album information" Width="30" Command="{Binding GetReleaseCommand}" VerticalAlignment="Center" Height="24" Grid.Column="2" Grid.Row="4" Margin="{StaticResource DefaultMargin}">
+                <Button.Content>
+                    <Canvas>
+                        <Path Canvas.Left="-8" Canvas.Top="-6" Width="14"  Stretch="Uniform" Fill="#FF000000" Data="{StaticResource searchPathData}"/>
+                    </Canvas>
+                </Button.Content>
+            </Button>
+            <Button ToolTip="Clear album search field" VerticalAlignment="Center" Width="30" Height="24" Grid.Column="3" Grid.Row="4" Margin="{StaticResource DefaultMargin}" Command="{Binding ClearReleaselistCommand}">
+                <Button.Content>
+                    <Canvas>
+                        <Path Canvas.Left="-10" Canvas.Top="-5" Width="16" Stretch="Uniform" Fill="#FF000000" Data="{StaticResource clearPathData}" />
+                    </Canvas>
+                </Button.Content>
+            </Button>
+        </Grid>
+    </StackPanel>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger SourceObject="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=NetworkVM}" EventName="ProxyChanged">
+            <i:InvokeCommandAction Command="{Binding ProxyChangedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+
+</UserControl>

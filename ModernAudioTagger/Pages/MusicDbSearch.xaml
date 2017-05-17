@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="ModernAudioTagger.Pages.InternetSearch"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:view="clr-namespace:ModernAudioTagger.View"
+             xmlns:content="clr-namespace:ModernAudioTagger.Content"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <Binding Source="{x:Static provider:ViewModelLocator.Instance}" Path="MusicDbVM"></Binding>
+    </UserControl.DataContext>
+
+    <!--<Grid>-->
+
+    <!-- content root for additional spacing -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel>
+
+            <StackPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="{StaticResource DefaultMargin}">
+                <mui:ModernButton 
+                        ToolTip="Help online"
+                        Command="{x:Static view:ViewCommands.OpenUrl}" 
+                        CommandParameter="{StaticResource doc_dbsearch}"
+                        EllipseDiameter="24" IconWidth="16" IconHeight="16"                           
+                        HorizontalAlignment="Right"
+                        Margin="{StaticResource DefaultRightMargin}"
+                        IconData="{StaticResource helpPathData}"              
+                    />
+            </StackPanel>
+
+            <Grid Grid.ColumnSpan="2" DockPanel.Dock="Bottom">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Rectangle />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="3" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="3"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <content:ContentMusicDbSearch Margin="{StaticResource SplitLeft}" />
+                    <content:ContentAudioTagVertical Grid.Column="2" Grid.RowSpan="3" Margin="{StaticResource SplitRight}"  />
+                    <GridSplitter Grid.Row="1" />
+                    <GridSplitter Grid.Column="1" Grid.RowSpan="3" />
+                    <content:ContentDbResult Grid.Row="2" />
+                </Grid>
+
+                <!-- optional status -->
+                <Grid Grid.Row="1" Margin="{StaticResource StatusMargin}" >
+                    <TextBlock Margin="{StaticResource DefaultLeftMargin}" Text="{Binding Status}" />
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </Grid>
+    <!--</Grid>-->
+
+</UserControl>

@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="ModernAudioTagger.Pages.LogViewerPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"             
+             xmlns:view="clr-namespace:ModernAudioTagger.View"
+             xmlns:converter="clr-namespace:ModernAudioTagger.Converter"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="600">
+    
+    
+    <UserControl.DataContext>
+        <Binding Source="{x:Static provider:ViewModelLocator.Instance}" Path="MainVM" />
+    </UserControl.DataContext>
+    
+    <UserControl.Resources>
+        <converter:LogsToTextConverter x:Key="logsToTextConverter" />
+    </UserControl.Resources>
+
+    <Grid Style="{StaticResource ContentRoot}">
+        
+        <DockPanel>
+            <StackPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="{StaticResource DefaultMargin}">
+                <mui:ModernButton 
+                        ToolTip="Copy text"
+                        Command="{x:Static view:ViewCommands.CopyTextToClipboard}" 
+                        CommandParameter="{Binding Logs, Converter={StaticResource logsToTextConverter}}"
+                        EllipseDiameter="24" IconWidth="16" IconHeight="16"                           
+                        HorizontalAlignment="Left"
+                        Margin="{StaticResource DefaultRightMargin}"
+                        IconData="{StaticResource copyPathData}"              
+                    />
+            </StackPanel>
+            <TextBlock 
+                HorizontalAlignment="Center"
+                DockPanel.Dock="Top"
+                Style="{StaticResource Heading1}">Error Log Report</TextBlock>
+            <ListView                            
+                DockPanel.Dock="Bottom"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource SeparatorBackground}"
+                Margin="{StaticResource DefaultMargin}"
+                SelectionMode="Single"      
+                ItemsSource="{Binding Logs}"
+                >
+                <ListView.Resources>
+                    <ContextMenu x:Key="ItemContextMenu">
+                        <MenuItem Header="Copy selected into clipboard" CommandParameter="{Binding Message}" Command="{x:Static view:ViewCommands.CopyTextToClipboard}" />
+                        <MenuItem Header="Copy all into clipboard" CommandParameter="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MainVM.Logs, Converter={StaticResource logsToTextConverter}}" Command="{x:Static view:ViewCommands.CopyTextToClipboard}" />
+                    </ContextMenu>
+                </ListView.Resources>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}" >
+                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="TYPE" DisplayMemberBinding="{Binding TypeMsg}" Width="60" />
+                        <GridViewColumn Header="DESCRIPTION" DisplayMemberBinding="{Binding Message}" Width="400" />
+                    </GridView>
+                </ListView.View>
+
+            </ListView>
+        </DockPanel>
+    </Grid>
+</UserControl>

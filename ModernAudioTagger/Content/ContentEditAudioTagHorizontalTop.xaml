@@ -1,0 +1,406 @@
+﻿<UserControl x:Class="ModernAudioTagger.Content.ContentEditAudioTagHorizontalTop"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"
+             xmlns:converter="clr-namespace:ModernAudioTagger.Converter"
+             xmlns:mscorlib="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="700">
+
+    <UserControl.DataContext>
+        <Binding Source="{x:Static provider:ViewModelLocator.Instance}" Path="TrackTagVM" />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <mscorlib:Double x:Key="textbox_height">20</mscorlib:Double>
+        <mscorlib:Double x:Key="text_width">200</mscorlib:Double>
+        <converter:ArraySplitConverter x:Key="arraysplitConverter" />
+        <converter:ImageConverter x:Key="imageConverter" />
+        <converter:ImageSwitchConverter x:Key="imageswitchConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+
+            </Grid.RowDefinitions>
+
+            <TextBlock FontSize="{StaticResource SmallFontSize}" HorizontalAlignment="Center" Text="Track" Style="{StaticResource Title}" Grid.ColumnSpan="3" />
+
+            <!-- Title -->
+            <TextBlock
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}"
+                    HorizontalAlignment="Left"
+                    Width="Auto"
+                    Grid.Row="1"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="Title" Style="{StaticResource Heading2}" />
+            <TextBox
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    HorizontalAlignment="Left"
+                    Width="{StaticResource text_width}"                  
+                    Text="{Binding SelectedModelTag.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                    Grid.Row="1" Grid.Column="1" 
+                />
+            <CheckBox
+                    IsChecked="{Binding IncludeTitle, Mode=TwoWay}"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}"
+                    Grid.Row="1" Grid.Column="2" 
+                />
+
+            <!-- Position -->
+            <TextBlock 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Grid.Row="2"                    
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="Position" Style="{StaticResource Heading2}" />
+            <TextBox 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="30"                  
+                    Text="{Binding SelectedModelTag.Position, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                    Grid.Row="2" Grid.Column="1" 
+                />
+            <CheckBox
+                    IsChecked="{Binding IncludePosition, Mode=TwoWay}"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}"
+                    Grid.Row="2" Grid.Column="2" 
+                />
+
+
+
+            <!-- Artists -->
+            <TextBlock                     
+                    Grid.Row="3"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Height="{StaticResource textbox_height}"
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="Artists" Style="{StaticResource Heading2}" />
+            <TextBox   
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Text="{Binding SelectedModelTag.TrackArtists, Converter={StaticResource arraysplitConverter}, Mode=TwoWay}" 
+                    Grid.Column="1" Grid.Row="3"               
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}"             
+                    HorizontalAlignment="Left"
+                    >
+            </TextBox>
+            <CheckBox
+                    FontSize="{StaticResource SmallFontSize}" 
+                    IsChecked="{Binding IncludeTrackArtist, Mode=TwoWay}"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}"
+                    Grid.Row="3" Grid.Column="2" 
+                />
+
+            <!-- Genres -->
+            <TextBlock       
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Grid.Row="4"
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="Genres" Style="{StaticResource Heading2}" />
+            <TextBox 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}"                  
+                    Text="{Binding SelectedModelTag.Genres, Converter={StaticResource arraysplitConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                    Grid.Row="4" Grid.Column="1" 
+                />
+
+            <!--<CheckBox
+                    IsChecked="{Binding IncludeGenres, Mode=TwoWay}"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}"
+                    Grid.Row="4" Grid.Column="2" 
+                />-->
+
+            <!-- MusicBrainzID -->
+            <TextBlock 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="MbId" Style="{StaticResource Heading2}" 
+                    Grid.Row="5"
+                />
+            <TextBox 
+                    Height="{StaticResource textbox_height}"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}"    
+                    Text="{Binding SelectedModelTag.TrackMbid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    FontSize="{StaticResource SmallFontSize}"
+                    Grid.Row="5" Grid.Column="1" />
+            <CheckBox 
+                HorizontalAlignment="Center" 
+                IsChecked="{Binding IncludeMbId, Mode=TwoWay}" 
+                Grid.Row="5" Grid.Column="2"
+                Margin="{StaticResource DefaultTopLeftMargin}" />
+
+        </Grid>
+
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Column="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5*"></RowDefinition>
+                <RowDefinition Height="8*"></RowDefinition>
+                <RowDefinition Height="8*"></RowDefinition>
+                <RowDefinition Height="8*"></RowDefinition>
+                <RowDefinition Height="8*"></RowDefinition>
+                <RowDefinition Height="24"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <TextBlock FontSize="{StaticResource SmallFontSize}" Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" Text="Release" Style="{StaticResource Title}" />
+
+            <!-- Album -->
+            <TextBlock 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="Album" Style="{StaticResource Heading2}" 
+                    Grid.Row="1"
+                />
+            <TextBox    
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Text="{Binding SelectedModelTag.Album, Mode=TwoWay}" 
+                    Grid.Column="1" Grid.Row="1"               
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}"        
+                    HorizontalAlignment="Left"
+                    >
+            </TextBox>
+            <CheckBox 
+                    IsChecked="{Binding IncludeRelease, Mode=TwoWay}"
+                    Grid.Column="2" Grid.Row="1"
+                    Margin="{StaticResource DefaultTopLeftMargin}"
+                    HorizontalAlignment="Left"
+                    />
+
+            <!-- Artists -->
+            <TextBlock 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="Artists" Style="{StaticResource Heading2}" 
+                    Grid.Row="2"
+                />
+            <TextBox       
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Text="{Binding SelectedModelTag.AlbumArtists, Converter={StaticResource arraysplitConverter}, Mode=TwoWay}" 
+                    Grid.Column="1" Grid.Row="2"               
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}"        
+                    HorizontalAlignment="Left"
+                    >
+            </TextBox>
+            <CheckBox 
+                    IsChecked="{Binding IncludeReleaseArtist, Mode=TwoWay}"
+                    Grid.Column="2" Grid.Row="2"
+                    Margin="{StaticResource DefaultTopLeftMargin}"
+                    HorizontalAlignment="Left"
+                    />
+
+            <!-- Year -->
+            <TextBlock 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="Year" Style="{StaticResource Heading2}" 
+                    Grid.Row="3"
+                />
+            <TextBox 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}"    
+                    Text="{Binding SelectedModelTag.Year, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Row="3" Grid.Column="1" />
+            <CheckBox 
+                    IsChecked="{Binding IncludeYear, Mode=TwoWay}"
+                    Grid.Column="2" Grid.Row="3"
+                    Margin="{StaticResource DefaultTopLeftMargin}"
+                    HorizontalAlignment="Left"
+                    />
+
+            <!-- Picture -->
+            <TextBlock 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="Cover" Style="{StaticResource Heading2}" 
+                    Grid.Row="4"
+                />
+            <CheckBox 
+                HorizontalAlignment="Center" 
+                IsChecked="{Binding IncludePicture, Mode=TwoWay}" 
+                Grid.Row="4" Grid.Column="2"
+                Margin="{StaticResource DefaultTopLeftMargin}" />
+
+            <!-- Release Mbid -->
+            <TextBlock 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    Width="Auto"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Text="MbId" Style="{StaticResource Heading2}" 
+                    Grid.Row="5"
+                />
+            <TextBox 
+                    Height="{StaticResource textbox_height}"
+                    FontSize="{StaticResource SmallFontSize}" 
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource DefaultTopLeftMargin}" 
+                    Width="{StaticResource text_width}"    
+                    Text="{Binding SelectedModelTag.ReleaseMbid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"                    
+                    Grid.Row="5" Grid.Column="1" />
+            <CheckBox 
+                HorizontalAlignment="Center" 
+                IsChecked="{Binding IncludeMbId, Mode=TwoWay}" 
+                Grid.Row="5" Grid.Column="3"
+                Margin="{StaticResource DefaultTopLeftMargin}" />
+
+        </Grid>
+
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Margin="{StaticResource DefaultTopLeftMargin}" Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Border 
+                Grid.ColumnSpan="3"                                
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="{StaticResource DefaultTopMargin}"
+                BorderThickness="1"
+                BorderBrush="Blue"
+                MinWidth="128"
+                MinHeight="128"                
+                >
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ItemTypeSelected}" Value="TRACK">
+                                <Setter Property="Visibility" Value="Collapsed"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Image                                               
+                    MaxWidth="128" 
+                    MaxHeight="128"             
+                    Stretch="Uniform"                       
+                    IsEnabled="{Binding IncludePicture}"                    
+                    Source="{Binding SelectedModelTag.Picture, Converter={StaticResource imageConverter}, FallbackValue={x:Null}, TargetNullValue={x:Null}}"
+                >
+                </Image>
+            </Border>
+
+
+            <Border 
+                Grid.ColumnSpan="3"                                
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="{StaticResource DefaultTopMargin}"
+                BorderThickness="1"
+                BorderBrush="Red"
+                MinWidth="128"
+                MinHeight="128"
+                >
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ItemTypeSelected}" Value="FILE">
+                                <Setter Property="Visibility" Value="Collapsed"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Image                                               
+                    MaxWidth="128" 
+                    MaxHeight="128"             
+                    Stretch="Uniform"                       
+                    IsEnabled="{Binding IncludePicture}"                    
+                    Source="{Binding ImagePath, FallbackValue={x:Null}, TargetNullValue={x:Null}}"                    
+                    >
+
+                </Image>
+            </Border>
+
+
+            <!--<ToggleButton Width="20" Height="20" IsChecked="{Binding IncludePicture, Mode=TwoWay}" Grid.Row="1" Margin="{StaticResource DefaultTopLeftMargin}" >
+                <ToggleButton.Content>
+                    <Path Fill="#FF000000" Stretch="Uniform" Data="F1 M 32.222,33.4875L 39.1886,40.0582L 51.3802,26.1251L 54.7052,29.0542L 39.5845,47.5L 28.897,36.8125L 32.222,33.4875 Z M 24,27L 48.5,27L 45.5,30L 27,30L 27,49L 46,49L 46,42.5L 49,38.75L 49,52L 24,52L 24,27 Z " />
+                </ToggleButton.Content>
+            </ToggleButton>-->
+            <!--
+            <mui:ModernButton Grid.Row="1" Grid.Column="0" Margin="{StaticResource DefaultTopLeftMargin}" IconData="{StaticResource uploadPathData}" Command="{Binding ImportPictureCommand}" />
+            <mui:ModernButton Grid.Row="1" Grid.Column="1" Margin="{StaticResource DefaultTopLeftMargin}" IconData="{StaticResource trashPathData}" Command="{Binding RemovePictureCommand}" />
+            <mui:ModernButton Grid.Row="1" Grid.Column="2" Margin="{StaticResource DefaultTopLeftMargin}" IconData="{StaticResource downloadPathData}" Command="{Binding ExportPictureCommand}" />
+            -->
+        </Grid>
+
+    </Grid>
+
+</UserControl>

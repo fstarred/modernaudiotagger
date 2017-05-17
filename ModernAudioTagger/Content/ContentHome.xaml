@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="ModernAudioTagger.Content.ContentHome"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <StackPanel Margin="15, 5, 15, 5">
+        <Grid Margin="{StaticResource DefaultTopMargin}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*"></ColumnDefinition>
+                <ColumnDefinition Width="50*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="{StaticResource DefaultLeftMargin}">
+                <Button Command="NavigationCommands.GoToPage" CommandParameter="/Pages/MusicDbSearch.xaml">
+                    <Image Source="../Assets/main.jpg"></Image>
+                </Button>
+                <Border Margin="{StaticResource DefaultMargin}" BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" >
+                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource Fixed}">ONLINE DB</TextBlock>
+                </Border>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="{StaticResource DefaultLeftMargin}">
+                <Button Command="NavigationCommands.GoToPage" CommandParameter="/Pages/AudioTag.xaml">
+                    <Image Source="../Assets/main.jpg"></Image>
+                </Button>
+                <Border Margin="{StaticResource DefaultMargin}" BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" >
+                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource Fixed}">MANUAL</TextBlock>
+                </Border>
+            </StackPanel>            
+        </Grid>
+    </StackPanel>
+
+</UserControl>

@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E5E0A7F4-C7D1-48A3-B1B3-D3AB37E7BD21}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ModernAudioTagger</RootNamespace>
+    <AssemblyName>Modern Audio Tagger</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FirstFloor.ModernUI">
+      <HintPath>..\packages\ModernUI.WPF.1.0.5\lib\net40\FirstFloor.ModernUI.dll</HintPath>
+    </Reference>
+    <Reference Include="MicroMVVM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\MicroMVVM.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Practices.Unity, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.Shell">
+      <HintPath>..\packages\ModernUI.WPF.1.0.5\lib\net40\Microsoft.Windows.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="MvvmFoundation.Wpf, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\MvvmFoundation.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Nini, Version=1.1.0.0, Culture=neutral, PublicKeyToken=691faec150a7fa7b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Nini.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BusinessLogic\DataContextSpy.cs" />
+    <Compile Include="BusinessLogic\ProviderServiceConstants.cs" />
+    <Compile Include="BusinessLogic\IDialogService.cs" />
+    <Compile Include="BusinessLogic\IWindowService.cs" />
+    <Compile Include="BusinessLogic\SaveDialogResult.cs" />
+    <Compile Include="BusinessLogic\ServiceUpdater.cs" />
+    <Compile Include="BusinessLogic\Utility.cs" />
+    <Compile Include="Content\ContentAudioTagHorizontalTop.xaml.cs">
+      <DependentUpon>ContentAudioTagHorizontalTop.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentBatchHelper.xaml.cs">
+      <DependentUpon>ContentBatchHelper.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentBottomList.xaml.cs">
+      <DependentUpon>ContentBottomList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentDbResult.xaml.cs">
+      <DependentUpon>ContentDbResult.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentEditAudioTagHorizontal.xaml.cs">
+      <DependentUpon>ContentEditAudioTagHorizontal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentEditAudioTagHorizontalTop.xaml.cs">
+      <DependentUpon>ContentEditAudioTagHorizontalTop.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentEditAudioTagVertical.xaml.cs">
+      <DependentUpon>ContentEditAudioTagVertical.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentFileList.xaml.cs">
+      <DependentUpon>ContentFileList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentFileListRename.xaml.cs">
+      <DependentUpon>ContentFileListRename.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentHome.xaml.cs">
+      <DependentUpon>ContentHome.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentLeftDbResult.xaml.cs">
+      <DependentUpon>ContentLeftDbResult.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentMedia.xaml.cs">
+      <DependentUpon>ContentMedia.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentMusicDbSearch.xaml.cs">
+      <DependentUpon>ContentMusicDbSearch.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentNetwork.xaml.cs">
+      <DependentUpon>ContentNetwork.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentRename.xaml.cs">
+      <DependentUpon>ContentRename.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentRightFileList.xaml.cs">
+      <DependentUpon>ContentRightFileList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentTopLocalPath.xaml.cs">
+      <DependentUpon>ContentTopLocalPath.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ContentAudioTagVertical.xaml.cs">
+      <DependentUpon>ContentAudioTagVertical.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converter\ArraySplitConverter.cs" />
+    <Compile Include="Converter\EnumMatchToBooleanConverter.cs" />
+    <Compile Include="Converter\FilenameConverter.cs" />
+    <Compile Include="Converter\ImageConverter.cs" />
+    <Compile Include="Converter\DataGridRowIndexConverter.cs" />
+    <Compile Include="Converter\ImageSwitchConverter.cs" />
+    <Compile Include="Converter\ListBoxItemIndexConverter.cs" />
+    <Compile Include="Converter\IsEqualOrGreaterThanConverter.cs" />
+    <Compile Include="Converter\LogsToTextConverter.cs" />
+    <Compile Include="Converter\NullToVisibilityConverter.cs" />
+    <Compile Include="Converter\SelectedCounterConverter.cs" />
+    <Compile Include="Converter\TrackLengthConverter.cs" />
+    <Compile Include="Helpers\BindingHelper.cs" />
+    <Compile Include="Helpers\DragDropBehaviour.cs" />
+    <Compile Include="Helpers\EventTriggerBehavior.cs" />
+    <Compile Include="Helpers\HelperNotifier.cs" />
+    <Compile Include="Helpers\LinqHelper.cs" />
+    <Compile Include="Helpers\ListBoxItemRefreshBehavior.cs" />
+    <Compile Include="Helpers\ListBoxMultipleSelectorHelper.cs" />
+    <Compile Include="Helpers\NotifierPanelHelper.cs" />
+    <Compile Include="Helpers\PasswordHelper.cs" />
+    <Compile Include="Helpers\RoutedEventTrigger.cs" />
+    <Compile Include="Helpers\ShowMessageBoxAction.cs" />
+    <Compile Include="Helpers\TextChangedCommand.cs" />
+    <Compile Include="Helpers\Type2Extension.cs" />
+    <Compile Include="Model\DefaultEventArgs.cs" />
+    <Compile Include="Model\ObservableCollectionExt.cs" />
+    <Compile Include="Pages\AudioTag.xaml.cs">
+      <DependentUpon>AudioTag.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Batch.xaml.cs">
+      <DependentUpon>Batch.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ExplorerPage.xaml.cs">
+      <DependentUpon>ExplorerPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\LogViewerPage.xaml.cs">
+      <DependentUpon>LogViewerPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\MusicDbSearch.xaml.cs">
+      <DependentUpon>MusicDbSearch.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Rename.xaml.cs">
+      <DependentUpon>Rename.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\TagDbResult.xaml.cs">
+      <DependentUpon>TagDbResult.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\TagPreviewPage.xaml.cs">
+      <DependentUpon>TagPreviewPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\MediaViewModel.cs" />
+    <Compile Include="Windows\LogViewer.xaml.cs">
+      <DependentUpon>LogViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ProcessingDialog.xaml.cs">
+      <DependentUpon>ProcessingDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\TagPreview.xaml.cs">
+      <DependentUpon>TagPreview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Provider\MediaPlayerProvider.cs" />
+    <Compile Include="Provider\SettingsLocator.cs" />
+    <Compile Include="Provider\UltimateMusicTaggerLocator.cs" />
+    <Compile Include="Provider\UnityContainerProvider.cs" />
+    <Compile Include="Provider\ViewModelLocator.cs" />
+    <Compile Include="Settings\AppSettings.cs" />
+    <Compile Include="Settings\NetworkSettings.cs" />
+    <Compile Include="Settings\SettingsManager.cs" />
+    <Compile Include="Validation\NumberValidation.cs" />
+    <Compile Include="ViewModelElement\FileVM.cs" />
+    <Compile Include="ViewModelElement\ISelectable.cs" />
+    <Compile Include="ViewModelElement\ModelTagVM.cs" />
+    <Compile Include="ViewModelElement\TrackInfoVM.cs" />
+    <Compile Include="ViewModel\BaseViewModel.cs" />
+    <Compile Include="ViewModel\BatchHelperViewModel.cs" />
+    <Compile Include="ViewModel\LocalSystemViewModel.cs" />
+    <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\MusicDbViewModel.cs" />
+    <Compile Include="ViewModel\NetworkViewModel.cs" />
+    <Compile Include="ViewModel\RenameViewModel.cs" />
+    <Compile Include="ViewModel\SettingsAppearanceViewModel.cs" />
+    <Compile Include="ViewModel\TrackTagViewModel.cs" />
+    <Compile Include="View\DialogService.cs" />
+    <Compile Include="View\InvokeDelegateCommandAction.cs" />
+    <Compile Include="View\ViewCommands.cs" />
+    <Compile Include="View\WindowService.cs" />
+    <Page Include="Assets\custom_resource.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentAudioTagHorizontalTop.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentBatchHelper.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentBottomList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentDbResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentEditAudioTagHorizontal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentEditAudioTagHorizontalTop.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentEditAudioTagVertical.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentFileList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentFileListRename.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentHome.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentLeftDbResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentMedia.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentMusicDbSearch.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentNetwork.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentRename.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentRightFileList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentTopLocalPath.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Content\ContentAudioTagVertical.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Content\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="Content\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Content\SettingsAppearance.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="Content\SettingsAppearance.xaml.cs">
+      <DependentUpon>SettingsAppearance.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Pages\AudioTag.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Batch.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ExplorerPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Home.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\LogViewerPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\MusicDbSearch.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Rename.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="Pages\Home.xaml.cs">
+      <DependentUpon>Home.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Page Include="Pages\TagDbResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\TagPreviewPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\LogViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ProcessingDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\TagPreview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\little_icon.ico" />
+    <Resource Include="Assets\background.png" />
+    <Resource Include="Assets\Icon.ico" />
+    <SplashScreen Include="Assets\Logo.png" />
+    <Content Include="lib\Microsoft.Practices.Unity.Configuration.dll" />
+    <Content Include="lib\Microsoft.Practices.Unity.dll" />
+    <Content Include="lib\Nini.dll" />
+    <Resource Include="Assets\main.jpg" />
+    <Resource Include="Assets\music_brainz.png" />
+    <Resource Include="Assets\lastfm.png" />
+    <Content Include="lib\MicroMVVM.dll" />
+    <Content Include="lib\MvvmFoundation.Wpf.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UltimateMp3Tagger\UltimateMp3Tagger.csproj">
+      <Project>{9399327e-7745-4918-85a2-d1020f0e47b4}</Project>
+      <Name>UltimateMp3Tagger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WpfExplorerTree\WpfExplorerTree.csproj">
+      <Project>{82b085e1-bb4e-4789-ba24-e55df1605286}</Project>
+      <Name>WpfExplorerTree</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

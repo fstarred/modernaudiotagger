@@ -1,0 +1,564 @@
+﻿<UserControl x:Class="ModernAudioTagger.Content.ContentBatchHelper"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:mscorlib="clr-namespace:System;assembly=mscorlib"
+             xmlns:vm="clr-namespace:ModernAudioTagger.ViewModel"
+             xmlns:converter="clr-namespace:ModernAudioTagger.Converter"
+             xmlns:helper="clr-namespace:ModernAudioTagger.Helpers"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+    <!--<Grid>-->
+
+    <UserControl.Resources>
+        <mscorlib:Double x:Key="textbox_height">20</mscorlib:Double>
+        <mscorlib:Double x:Key="text_width">200</mscorlib:Double>        
+        <ObjectDataProvider
+            x:Key="destinationType"
+            MethodName="GetValues"
+            ObjectType="{x:Type mscorlib:Enum}"
+            >
+            <ObjectDataProvider.MethodParameters>
+                <helper:Type2Extension TypeName="vm:BatchHelperViewModel+DESTINATION_TYPE" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider
+            x:Key="actionsType"
+            MethodName="GetValues"
+            ObjectType="{x:Type mscorlib:Enum}"
+            >
+            <ObjectDataProvider.MethodParameters>
+                <helper:Type2Extension TypeName="vm:BatchHelperViewModel+ACTION" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider
+            x:Key="modeType"
+            MethodName="GetValues"
+            ObjectType="{x:Type mscorlib:Enum}"
+            >
+            <ObjectDataProvider.MethodParameters>
+                <helper:Type2Extension TypeName="vm:BatchHelperViewModel+TAG_MODE" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider
+            x:Key="matchType"
+            MethodName="GetValues"
+            ObjectType="{x:Type mscorlib:Enum}"
+            >
+            <ObjectDataProvider.MethodParameters>
+                <helper:Type2Extension TypeName="vm:BatchHelperViewModel+MATCH_MODE" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <Style x:Key="styleTextBoxManualMode" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Visibility" Value="Visible"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedTagMode}" Value="LASTFM">
+                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <!-- COMMON SECTION -->
+        <StackPanel HorizontalAlignment="Left" >
+            <TextBlock Text="COMMAND LINE" Style="{StaticResource Heading2}" />
+            <TextBox
+            Height="50"
+            TextWrapping="Wrap"
+            HorizontalAlignment="Left"
+            Width="500"
+            Text="{Binding Preview}"
+            IsReadOnly="True"            
+            >
+            </TextBox>
+            <TextBlock Text="ACTION" Style="{StaticResource Heading2}" />
+            <ComboBox
+                HorizontalAlignment="Left"
+                Width="150"
+                ItemsSource="{Binding Source={StaticResource actionsType}, Mode=OneTime}"
+                SelectedValue="{Binding SelectedAction, Mode=TwoWay}"
+                SelectedIndex="0"
+                >
+            </ComboBox>
+            <Grid HorizontalAlignment="Left" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60*"></ColumnDefinition>
+                    <ColumnDefinition Width="30*"></ColumnDefinition>
+                    <ColumnDefinition Width="10*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock Text="INPUT" Style="{StaticResource Heading2}" />
+                <TextBlock Margin="{StaticResource DefaultLeftMargin}" Text="TYPE" Style="{StaticResource Heading2}" Grid.Column="1" />
+                <TextBox                           
+                    x:Name="txt_destination_type"
+                    Text="{Binding Destination, UpdateSourceTrigger=PropertyChanged}"
+                    IsReadOnly="False" 
+                    Width="350"
+                    Grid.Row="1"
+                >
+                </TextBox>
+                <ComboBox                
+                    x:Name="cmb_destination_type"                
+                    SelectedValue="{Binding SelectedDestinationType, Mode=TwoWay}"
+                    SelectedIndex="0"
+                    Grid.Column="1"
+                    Grid.Row="1"                
+                    Margin="{StaticResource DefaultLeftMargin}"
+                >
+                    <!--ItemsSource="{Binding Path='.', Converter={StaticResource batchInputConverter}}"-->
+                    <ComboBox.Style>
+                        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+                            <Setter Property="ItemsSource">
+                                <Setter.Value>
+                                    <x:Array Type="{x:Type vm:BatchHelperViewModel+DESTINATION_TYPE}">
+                                        <x:Static Member="vm:BatchHelperViewModel+DESTINATION_TYPE.FILE" />
+                                        <x:Static Member="vm:BatchHelperViewModel+DESTINATION_TYPE.MULTIPLE_FILES" />                               
+                                    </x:Array>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedAction}" Value="RENAME">
+                                    <Setter Property="ItemsSource">
+                                        <Setter.Value>
+                                            <Binding Source="{StaticResource destinationType}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ComboBox.Style>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <ei:ChangePropertyAction TargetName="txt_destination_type" PropertyName="Text" Value="" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
+                <Button
+                Margin="{StaticResource DefaultLeftMargin}"
+                Content="..."
+                Grid.Column="2"
+                Grid.Row="1"
+                Width="40"
+                Command="{Binding SelectDestinationCommand}" HorizontalAlignment="Right"
+                />
+            </Grid>
+        </StackPanel>
+
+        <!-- TAG SECTION -->
+        <StackPanel>
+            <StackPanel.Style>
+                <Style TargetType="{x:Type StackPanel}">
+                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedAction}" Value="TAG">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <TextBlock Text="MODE" Style="{StaticResource Heading2}" />
+            <ComboBox                
+                HorizontalAlignment="Left"
+                Width="150"
+                ItemsSource="{Binding Source={StaticResource modeType}}"
+                SelectedValue="{Binding SelectedTagMode, Mode=TwoWay}"
+                SelectedIndex="0"
+                >
+            </ComboBox>
+
+            <Grid x:Name="grd_lastfm_search" HorizontalAlignment="Left">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedTagMode}" Value="LASTFM">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <!-- LASTFM ARTIST -->
+                <TextBlock Text="ARTIST" Style="{StaticResource Heading2}" />
+                <TextBox 
+                    Text="{Binding SearchArtist, UpdateSourceTrigger=PropertyChanged}"                
+                    Width="{StaticResource text_width}"
+                    Grid.Row="1"
+                >
+                </TextBox>
+
+                <!-- LASTFM ALBUM -->
+                <TextBlock Margin="{StaticResource DefaultLeftMargin}" x:Name="tbl_album" Text="ALBUM" Grid.Column="1" >
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Heading2}">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FILE">
+                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBox 
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    x:Name="txt_album"
+                    Width="{StaticResource text_width}"
+                    Text="{Binding SearchAlbum, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="1"                
+                    Grid.Row="1"
+                >
+                    <TextBox.Style>
+                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FILE">
+                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <!-- LASTFM TITLE -->
+                <TextBlock Margin="{StaticResource DefaultLeftMargin}" x:Name="tbl_title" Text="TITLE" Grid.Column="1" >
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Heading2}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FILE">
+                                    <Setter Property="Visibility" Value="Visible"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBox 
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Text="{Binding SearchTitle, UpdateSourceTrigger=PropertyChanged}"
+                    Width="{StaticResource text_width}"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                >
+                    <TextBox.Style>
+                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FILE">
+                                    <Setter Property="Visibility" Value="Visible"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <!-- LASTFM MATCH FILE TYPE -->
+                <TextBlock Margin="{StaticResource DefaultLeftMargin}" Text="MATCH" Grid.Column="2">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Heading2}">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FILE">
+                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <ComboBox 
+                    Margin="{StaticResource DefaultLeftMargin}"                                
+                    Width="{StaticResource text_width}"
+                    Grid.Column="2"
+                    Grid.Row="1"
+                    SelectedValue="{Binding SelectedMatch}"
+                    ItemsSource="{Binding Source={StaticResource matchType}}"
+                    SelectedIndex="0"
+                    >
+                    <ComboBox.Style>
+                        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FILE">
+                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ComboBox.Style>
+                </ComboBox>
+            </Grid>
+
+            <TextBlock Text="FIELDS" Style="{StaticResource Heading2}" />
+            <Grid HorizontalAlignment="Left">
+                <Grid.Resources>
+                    <mscorlib:Double x:Key="txt_wdth">150</mscorlib:Double>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <!--<StackPanel>-->
+                <CheckBox
+                    Content="Title"
+                    IsChecked="{Binding IncludeTitle}"
+                    />
+                <TextBox 
+                    Style="{StaticResource styleTextBoxManualMode}"
+                    Width="{StaticResource txt_wdth}"
+                    Grid.Column="1"
+                    Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                    ></TextBox>
+                <CheckBox
+                    Grid.Row="1"
+                    Content="Track"
+                    IsChecked="{Binding IncludePosition, UpdateSourceTrigger=PropertyChanged}"
+                    />
+                <TextBox 
+                    Style="{StaticResource styleTextBoxManualMode}"
+                    Width="{StaticResource txt_wdth}"
+                    Text="{Binding Position, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    ></TextBox>
+                <CheckBox                    
+                    Grid.Row="2"
+                    Content="Artists track"
+                    IsChecked="{Binding IncludeTrackArtist, UpdateSourceTrigger=PropertyChanged}"
+                    />
+                <TextBox 
+                    Style="{StaticResource styleTextBoxManualMode}"
+                    Width="{StaticResource txt_wdth}"
+                    Text="{Binding ArtistsTrack, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="1"
+                    Grid.Row="2"
+                    ></TextBox>
+                <CheckBox
+                    Grid.Row="3"
+                    Content="Genres (,)"
+                    IsChecked="{Binding IncludeGenres, UpdateSourceTrigger=PropertyChanged}"
+                    />
+                <TextBox 
+                    Style="{StaticResource styleTextBoxManualMode}"
+                    Width="{StaticResource txt_wdth}"
+                    Text="{Binding Genres, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="1"
+                    Grid.Row="3"
+                    ></TextBox>
+                <CheckBox
+                    Grid.Row="4"
+                    Content="MusicBrainz Id"
+                    IsChecked="{Binding IncludeMbId, UpdateSourceTrigger=PropertyChanged}"
+                    />
+
+                <!--</StackPanel>-->
+                <!--<StackPanel Grid.Column="1" >-->
+                <CheckBox
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    Content="Album"
+                    IsChecked="{Binding IncludeRelease, UpdateSourceTrigger=PropertyChanged}"
+                    />
+                <TextBox        
+                    Style="{StaticResource styleTextBoxManualMode}"
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Width="{StaticResource txt_wdth}"
+                    Text="{Binding Album, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="3"
+                    Grid.Row="0"
+                    ></TextBox>
+                <CheckBox
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Grid.Column="2"
+                    Grid.Row="1"
+                    Content="Artists album (,)"
+                    IsChecked="{Binding IncludeReleaseArtist, UpdateSourceTrigger=PropertyChanged}"
+                    />
+                <TextBox 
+                    Style="{StaticResource styleTextBoxManualMode}"
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Width="{StaticResource txt_wdth}"
+                    Text="{Binding AlbumArtists, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="3"
+                    Grid.Row="1"
+                    ></TextBox>
+                <CheckBox
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Grid.Column="2"
+                    Grid.Row="2"
+                    Content="Year"
+                    IsChecked="{Binding IncludeYear, UpdateSourceTrigger=PropertyChanged}"
+                    />
+                <TextBox 
+                    Style="{StaticResource styleTextBoxManualMode}"
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Width="{StaticResource txt_wdth}"
+                    Text="{Binding Year, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="3"
+                    Grid.Row="2"
+                    ></TextBox>
+                <CheckBox
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Grid.Column="2"
+                    Grid.Row="3"
+                    Content="Image path"
+                    IsChecked="{Binding IncludePicture, UpdateSourceTrigger=PropertyChanged}"
+                    />
+                <TextBox 
+                    Style="{StaticResource styleTextBoxManualMode}"
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Width="{StaticResource txt_wdth}"
+                    Text="{Binding Cover, UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="3"
+                    Grid.Row="3"
+                    ></TextBox>
+                <!--</StackPanel>-->
+            </Grid>
+
+        </StackPanel>
+
+        <!-- RENAME SECTION -->
+        <StackPanel HorizontalAlignment="Left">
+            <StackPanel.Style>
+                <Style TargetType="{x:Type StackPanel}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedAction}" Value="RENAME">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <TextBlock Text="FILE TAG REFERENCE">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource Heading2}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FOLDER">
+                                <Setter Property="Visibility" Value="Visible"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- FILE TAG REFERENCE -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <StackPanel.Style>
+                    <Style TargetType="{x:Type StackPanel}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FOLDER">
+                                <Setter Property="Visibility" Value="Visible"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBox 
+                    Text="{Binding RefTag, UpdateSourceTrigger=PropertyChanged}"
+                    Width="400"                
+                    >
+                </TextBox>
+                <Button
+                    Margin="{StaticResource DefaultLeftMargin}"
+                    Content="..."
+                    Width="40"
+                    Command="{Binding SelectModelTagCommand}" HorizontalAlignment="Right"
+                />
+            </StackPanel>
+            <!-- LEGENDA -->
+            <TextBlock Text="LEGENDA" Style="{StaticResource Heading2}"></TextBlock>
+            <ListBox
+                x:Name="lb_legenda"
+                Height="100"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource SeparatorBackground}"                 
+                >
+                <ListBox.Style>
+                    <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource {x:Type ListBox}}">
+                        <Setter Property="ItemsSource">
+                            <Setter.Value>
+                                <x:Array Type="{x:Type mscorlib:String}">
+                                    <mscorlib:String>%r %R %album - Album</mscorlib:String>
+                                    <mscorlib:String>%t %T %title - Title</mscorlib:String>
+                                    <mscorlib:String>%aa %AA %aartist - Album Artist</mscorlib:String>
+                                    <mscorlib:String>%ta %TA %tartist - Track Artist</mscorlib:String>
+                                    <mscorlib:String>%p %P %pos - Track position</mscorlib:String>
+                                    <mscorlib:String>%y %Y %d %D %year - Year</mscorlib:String>
+                                </x:Array>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedDestinationType}" Value="FOLDER">
+                                <Setter Property="ItemsSource">
+                                    <Setter.Value>
+                                        <x:Array Type="{x:Type mscorlib:String}">
+                                            <mscorlib:String>%r %R %album - Album</mscorlib:String>
+                                            <mscorlib:String>%aa %AA %aartist - Album Artist</mscorlib:String>
+                                            <mscorlib:String>%ta %TA %tartist - Track Artist</mscorlib:String>
+                                            <mscorlib:String>%y %Y %d %D %year - Year</mscorlib:String>
+                                        </x:Array>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.Style>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction CommandParameter="{Binding ElementName=lb_legenda, Path=SelectedValue}" Command="{Binding AddToPatternCommand}" >
+                            <!--<i:InvokeCommandAction.CommandParameter>
+                                <mscorlib:Boolean>True</mscorlib:Boolean>
+                            </i:InvokeCommandAction.CommandParameter>-->
+                        </i:InvokeCommandAction>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListBox>
+            <TextBlock Text="PATTERN" Style="{StaticResource Heading2}"></TextBlock>
+            <TextBox        
+                HorizontalAlignment="Left"
+                Text="{Binding Pattern, UpdateSourceTrigger=PropertyChanged}"
+                Width="450"
+                >
+            </TextBox>
+        </StackPanel>
+
+    </StackPanel>
+
+
+
+    <i:Interaction.Triggers>
+
+        <!--<helper:RoutedEventTrigger RoutedEvent="{x:Static helper:NotifierPanelHelper.ChildrenChangedEvent}">
+            <i:InvokeCommandAction Command="{Binding UpdatePreviewCommand}" />
+        </helper:RoutedEventTrigger>-->
+
+    </i:Interaction.Triggers>
+
+    <!--</Grid>-->
+</UserControl>

@@ -1,0 +1,23 @@
+﻿<mui:ModernWindow x:Class="ModernAudioTagger.Windows.LogViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:pages="clr-namespace:ModernAudioTagger.Pages"
+             WindowStartupLocation="CenterScreen"
+             Title="Error Log Report"
+             LogoData="{StaticResource alertPathData}"   
+             Icon="/Assets/little_icon.ico"
+             mc:Ignorable="d"                     
+            >
+
+    <mui:ModernWindow.Style>
+        <Style TargetType="{x:Type mui:ModernWindow}" BasedOn="{StaticResource EmptyWindow}">
+
+        </Style>
+    </mui:ModernWindow.Style>
+
+    <pages:LogViewerPage />
+        
+</mui:ModernWindow>

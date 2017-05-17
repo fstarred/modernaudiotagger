@@ -1,0 +1,260 @@
+﻿<UserControl x:Class="ModernAudioTagger.Content.ContentRightFileList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:blogic="clr-namespace:ModernAudioTagger.BusinessLogic"
+             xmlns:provider="clr-namespace:ModernAudioTagger.Provider"
+             xmlns:converter="clr-namespace:ModernAudioTagger.Converter"
+             xmlns:helper="clr-namespace:ModernAudioTagger.Helpers"
+             xmlns:view="clr-namespace:ModernAudioTagger.View"
+             xmlns:mscorelib="clr-namespace:System;assembly=mscorlib"             
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"                
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.DataContext>
+        <Binding Source="{x:Static provider:ViewModelLocator.Instance}" Path="TrackTagVM" />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <converter:DataGridRowIndexConverter x:Key="indexConverter" />
+        <converter:FilenameConverter x:Key="filenameConverter" />
+        <converter:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
+        <converter:IsEqualOrGreaterThanConverter x:Key="isEqualOrGreaterThanConverter" />
+    </UserControl.Resources>
+
+    <!--<Grid>-->
+
+    <Border
+        BorderThickness="1"
+        BorderBrush="{DynamicResource SeparatorBackground}"
+        >
+        <DockPanel LastChildFill="True">
+
+            <!--<StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="{StaticResource DefaultTopMargin}">                
+                <mui:ModernButton />
+                <mui:ModernButton Margin="{StaticResource DefaultLeftMargin}" />                
+            </StackPanel>-->
+
+            <Grid DockPanel.Dock="Left" Margin="{StaticResource DefaultMargin}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel VerticalAlignment="Center">
+                    <mui:ModernButton IconData="{StaticResource arrowLeftPathData}" RenderTransformOrigin="0.5,0.5" CommandParameter="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM.SelectedFiles}" Command="{Binding MoveFileUpCommand}">
+                        <mui:ModernButton.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="90"/>
+                            </TransformGroup>
+                        </mui:ModernButton.RenderTransform>
+                    </mui:ModernButton>
+                    <mui:ModernButton IconData="{StaticResource arrowLeftPathData}" RenderTransformOrigin="0.5,0.5" Margin="{StaticResource DefaultTopMargin}" CommandParameter="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM.SelectedFiles}" Command="{Binding MoveFileDownCommand}">
+                        <mui:ModernButton.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="270"/>
+                            </TransformGroup>
+                        </mui:ModernButton.RenderTransform>
+                    </mui:ModernButton>
+                </StackPanel>
+                <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                    <mui:ModernButton IconData="{StaticResource alphabeticalDescPathData}" Command="{Binding OrderFilesByNameCommand}"></mui:ModernButton>
+                    <mui:ModernButton IconData="{StaticResource numericDescPathData}" Margin="{StaticResource DefaultTopMargin}" Command="{Binding OrderFilesByNumberCommand}"></mui:ModernButton>
+                </StackPanel>
+
+            </Grid>
+
+            <StackPanel HorizontalAlignment="Center" DockPanel.Dock="Top">
+                <StackPanel.Style>
+                    <Style TargetType="{x:Type StackPanel}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM.Files.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock HorizontalAlignment="Center">List is empty</TextBlock>
+                <mui:BBCodeBlock BBCode="[url=/Pages/AudioTag.xaml]Click here[/url]" Margin="0, 5, 0, 0" HorizontalAlignment="Center"></mui:BBCodeBlock>
+            </StackPanel>
+
+
+            <ListView                
+                FontSize="{StaticResource SmallFontSize}" 
+                ItemsSource="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM.Files}"  
+                SelectionMode="Extended"    
+                VirtualizingStackPanel.IsVirtualizing="False"
+                helper:ListBoxMultipleSelectorHelper.SelectedItems="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM.SelectedFiles, Mode=TwoWay}"                                            
+                DockPanel.Dock="Top"
+                >
+                <ListView.Style>
+                    <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListView}}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM.Files.Count, Converter={StaticResource isEqualOrGreaterThanConverter}, ConverterParameter='1'}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.Style>
+                <ListView.InputBindings>
+                    <KeyBinding Key="Space" Command="{Binding CheckSelectedItemsCommand}" />
+                </ListView.InputBindings>
+                
+                <!--<ListView.ContextMenu>
+                    <ContextMenu>
+                               
+                    </ContextMenu>
+                </ListView.ContextMenu>-->
+                
+                <ListView.Resources>
+                    <ContextMenu x:Key="ItemContextMenu"
+                                 >
+                        <MenuItem Header="Check selected" Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.CheckSelectedItemsCommand}">
+                            <MenuItem.Icon>
+                                <Path Fill="#FF2B2B2B"
+                                      Width="14.3775"
+                                      Height="14"
+                                      Canvas.Left="0.311264"
+                                      Canvas.Top="0.500005"
+                                      Stretch="Uniform"
+                                      Data="{StaticResource checkPathData}"
+                                      />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Check/Uncheck all" Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.CheckAllItemsCommand}">
+                            <MenuItem.Icon>
+                                <Path Fill="#FF2B2B2B"
+                                      Width="14.3775"
+                                      Height="14"
+                                      Canvas.Left="0.311264"
+                                      Canvas.Top="0.500005"
+                                      Stretch="Uniform"
+                                      Data="{StaticResource checkPathData}"
+                                      />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Order by matching name" Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.OrderFilesByNameCommand}">
+                            <MenuItem.Icon>
+                                <Path Fill="#FF2B2B2B"
+                                      Width="14.3775"
+                                      Height="14"
+                                      Canvas.Left="0.311264"
+                                      Canvas.Top="0.500005"
+                                      Stretch="Uniform"
+                                      Data="{StaticResource alphabeticalDescPathData}"
+                                      />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Order by matching number" Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.OrderFilesByNumberCommand}">
+                            <MenuItem.Icon>
+                                <Path Fill="#FF2B2B2B"
+                                      Width="14.3775"
+                                      Height="14"
+                                      Canvas.Left="0.311264"
+                                      Canvas.Top="0.500005"
+                                      Stretch="Uniform"
+                                      Data="{StaticResource numericDescPathData}"
+                                      />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Open folder location" CommandParameter="{Binding FileName}" Command="{Binding Source={x:Static view:ViewCommands.OpenFolderLocation}}">
+                            <MenuItem.Icon>
+                                <Path Fill="#FF2B2B2B"
+                                      Width="14.3775"
+                                      Height="14"
+                                      Canvas.Left="0.311264"
+                                      Canvas.Top="0.500005"
+                                      Stretch="Uniform"
+                                      Data="{StaticResource openFolderPathData}"
+                                      />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Play file" CommandParameter="{Binding FileName}" Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=MainVM.PlayFileCommand}">
+                            <MenuItem.Icon>
+                                <Path Fill="#FF2B2B2B"
+                                      Width="14.3775"
+                                      Height="14"
+                                      Canvas.Left="0.311264"
+                                      Canvas.Top="0.500005"
+                                      Stretch="Uniform"
+                                      Data="{StaticResource playPathData}"
+                                      />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </ListView.Resources>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <i:Interaction.Behaviors>
+                    <helper:ListBoxItemRefreshBehavior />
+                </i:Interaction.Behaviors>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="30">
+                            <GridViewColumnHeader Command="{Binding CheckAllItemsCommand}">
+                                <GridViewColumnHeader.Content>
+                                    <Path Stretch="Uniform" Width="16" Fill="#FF000000"  Data="{StaticResource checkPathData}" />
+                                </GridViewColumnHeader.Content>
+                            </GridViewColumnHeader>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Stretch">
+                                        <CheckBox 
+                                        IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                        >
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Checked">
+                                                    <i:InvokeCommandAction Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.CheckSelectionChangedCommand}" CommandParameter="{Binding}" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="Unchecked">
+                                                    <i:InvokeCommandAction Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.CheckSelectionChangedCommand}" CommandParameter="{Binding}" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonDown" >
+                                                    <i:InvokeCommandAction Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.ExlusiveSelectItemCommand}" CommandParameter="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </CheckBox>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="#" Width="30">
+                            <GridViewColumn.DisplayMemberBinding>
+                                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}">
+                                    <Binding.Converter>
+                                        <converter:ListBoxItemIndexConverter />
+                                    </Binding.Converter>
+                                    <Binding.ConverterParameter>
+                                        <mscorelib:Boolean>True</mscorelib:Boolean>
+                                    </Binding.ConverterParameter>
+                                </Binding>
+                            </GridViewColumn.DisplayMemberBinding>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding FileName, Converter={StaticResource filenameConverter}}" />
+                    </GridView>
+                </ListView.View>
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=TrackTagVM.ShowFileTagCommand}" CommandParameter="{Binding Source={x:Static provider:ViewModelLocator.Instance}, Path=LocalSystemVM.SelectedFiles}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+            </ListView>
+
+        </DockPanel>
+    </Border>
+    
+    <!--</Grid>-->
+</UserControl>

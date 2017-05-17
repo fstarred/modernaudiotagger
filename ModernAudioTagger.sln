@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernAudioTagger", "ModernAudioTagger\ModernAudioTagger.csproj", "{E5E0A7F4-C7D1-48A3-B1B3-D3AB37E7BD21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltimateMp3Tagger", "UltimateMp3Tagger\UltimateMp3Tagger.csproj", "{9399327E-7745-4918-85A2-D1020F0E47B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltimateMp3TaggerShell", "UltimateMp3TaggerShell\UltimateMp3TaggerShell.csproj", "{619A3F97-96AD-432C-86B8-8668929F72A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfExplorerTree", "WpfExplorerTree\WpfExplorerTree.csproj", "{82B085E1-BB4E-4789-BA24-E55DF1605286}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs37
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ModernAudioTagger\\ModernAudioTagger.csproj
+		SccProjectName1 = ModernAudioTagger
+		SccLocalPath1 = ModernAudioTagger
+		SccProjectUniqueName2 = UltimateMp3Tagger\\UltimateMp3Tagger.csproj
+		SccProjectName2 = UltimateMp3Tagger
+		SccLocalPath2 = UltimateMp3Tagger
+		SccProjectUniqueName3 = UltimateMp3TaggerShell\\UltimateMp3TaggerShell.csproj
+		SccProjectName3 = UltimateMp3TaggerShell
+		SccLocalPath3 = UltimateMp3TaggerShell
+		SccProjectUniqueName4 = WpfExplorerTree\\WpfExplorerTree.csproj
+		SccProjectName4 = WpfExplorerTree
+		SccLocalPath4 = WpfExplorerTree
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5E0A7F4-C7D1-48A3-B1B3-D3AB37E7BD21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5E0A7F4-C7D1-48A3-B1B3-D3AB37E7BD21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5E0A7F4-C7D1-48A3-B1B3-D3AB37E7BD21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5E0A7F4-C7D1-48A3-B1B3-D3AB37E7BD21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9399327E-7745-4918-85A2-D1020F0E47B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9399327E-7745-4918-85A2-D1020F0E47B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9399327E-7745-4918-85A2-D1020F0E47B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9399327E-7745-4918-85A2-D1020F0E47B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{619A3F97-96AD-432C-86B8-8668929F72A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{619A3F97-96AD-432C-86B8-8668929F72A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{619A3F97-96AD-432C-86B8-8668929F72A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{619A3F97-96AD-432C-86B8-8668929F72A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82B085E1-BB4E-4789-BA24-E55DF1605286}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82B085E1-BB4E-4789-BA24-E55DF1605286}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82B085E1-BB4E-4789-BA24-E55DF1605286}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82B085E1-BB4E-4789-BA24-E55DF1605286}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

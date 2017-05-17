@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="ModernAudioTagger.Content.About"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:business="clr-namespace:ModernAudioTagger.BusinessLogic"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="500">
+    
+    <UserControl.Resources>
+        <ObjectDataProvider
+            x:Key="version"
+            ObjectType="business:Utility"
+            MethodName="GetProductVersion" />
+    </UserControl.Resources>
+    
+    <Grid>
+        <ScrollViewer>
+            <StackPanel MinWidth="200" Margin="15, 5, 15, 5">
+                <TextBlock HorizontalAlignment="Center">
+                    <Hyperlink NavigateUri="{StaticResource apphomepage}" Style="{StaticResource baseHyperlink}">
+                        <Image Source="/Assets/Icon.ico" Width="200" Stretch="Uniform" ></Image>
+                    </Hyperlink>
+                </TextBlock>
+                <TextBlock HorizontalAlignment="Center" Style="{StaticResource Heading1}" Text="{StaticResource app_title}" />
+                <TextBlock HorizontalAlignment="Center" Style="{StaticResource Fixed}">Copyright © 2014</TextBlock>
+                <TextBlock Margin="{StaticResource DefaultTopMargin}" HorizontalAlignment="Center">
+                    <Run Text="Version " />
+                    <Run Text="{Binding Mode=OneWay, Source={StaticResource version} }" />
+                </TextBlock>
+                <mui:BBCodeBlock Margin="{StaticResource DefaultTopMargin}"  HorizontalAlignment="Center" BBCode="[url=http://www.codeplex.com/site/users/view/Zenon66]Fabrizio Stellato[/url]"></mui:BBCodeBlock>
+                <mui:BBCodeBlock Margin="0, 10, 0, 0" HorizontalAlignment="Center" BBCode="[url=mailto:fabrizio.stellato@gmail.com?subject=About%20Modern%20Audio%20Tagger;]Mail the author[/url]"></mui:BBCodeBlock>
+                <mui:BBCodeBlock Margin="0, 10, 0, 0" HorizontalAlignment="Center" BBCode="[url=http://modernaudiotagger.codeplex.com]Project site[/url]"></mui:BBCodeBlock>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
