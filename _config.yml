@@ -1,1 +1,7 @@
 theme: jekyll-theme-cayman
+show_downloads: "true"
+title: "Modern Audio Tagger"
+description: "Modern Audio Tagger is a powerful, easy and extreme fast tool to reorganize your music library"
+author: "Starred MediaSoft"
+plugins:
+  - jekyll-seo-tag
