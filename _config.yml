@@ -5,3 +5,4 @@ description: "Modern Audio Tagger is a powerful, easy and extreme fast tool to r
 author: "Starred MediaSoft"
 plugins:
   - jekyll-seo-tag
+  - jekyll-sitemap
