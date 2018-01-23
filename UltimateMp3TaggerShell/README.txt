@@ -73,16 +73,17 @@ use p mode when having filename with "Track 01" "Track 02" under working folder.
 
 pattern=<<pattern>> rename file(s) with specified pattern.
 
-song title = %t %title
-artist = %a %artist
-album = %r %album
-year = %y %d %year
-track position =%p %pos
+track title		= %t %title
+album artist	= %aa %aartist
+track artist	= %ta %tartist
+album			= %r %album
+year			= %y %d %year
+track position	= %p %pos
 
 some examples:
 
 "%p - %t" = "01 - Taxman.mp3"
-"%a %r - %t %y" = "The Beatles Revolver - Taxman 1995.mp3"
+"%aa %r - %t %y" = "The Beatles Revolver - Taxman 1995.mp3"
 "foo %t %p" = "foo Taxman 01.mp3"
 
 Performing Lastfm search

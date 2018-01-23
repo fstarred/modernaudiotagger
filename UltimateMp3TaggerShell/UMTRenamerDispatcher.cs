@@ -26,8 +26,9 @@ namespace UltimateMp3TaggerShell
             umTagger = new UltiMp3Tagger();            
         }
 
+        enum PATTERN_TYPE { FILE, FOLDER }
 
-        private void ShowPatternUsage()
+        private void ShowPatternUsage(PATTERN_TYPE patternType)
         {
             ConsoleColor color4field = ConsoleColor.White;
             ConsoleColor color4pattern = ConsoleColor.Cyan;
@@ -44,26 +45,39 @@ namespace UltimateMp3TaggerShell
                 Console.WriteLine(pattern);
             };
 
-            Console.ForegroundColor = ConsoleColor.Green;
+            //Console.ForegroundColor = ConsoleColor.Green;
             Console.Write(Environment.NewLine);
             Console.WriteLine("pattern legend:");
 
             string separator = ": ";
 
-            printAction("title", separator, "%t|%title");
-            printAction("artist", separator, "%a|%artist");
+            if (patternType == PATTERN_TYPE.FILE)
+            {
+                printAction("title", separator, "%t|%title");
+            }            
+            printAction("album artist", separator, "%aa|%album artist");
+            printAction("track artist", separator, "%ta|%track artist");
             printAction("album", separator, "%r|%album");
             printAction("year", separator, "%d|%y|%year");
-            printAction("position", separator, "%p|%pos");
+            if (patternType == PATTERN_TYPE.FILE)
+            {
+                printAction("position", separator, "%p|%pos");
+            }
 
             separator = " = ";
-
-            Console.ForegroundColor = ConsoleColor.Green;
+            
             Console.Write(Environment.NewLine);
             Console.WriteLine("some examples:");
-            printAction("\"%p - %t\"", separator, "pattern - title");
-            printAction("\"%a - %r - %t\"", separator, "artist - album - title");
-            printAction("\"(%y) %r - %a - %t\"", separator, "(year) album - artist - title");                        
+            if (patternType == PATTERN_TYPE.FILE)
+            {
+                printAction("\"%p - %t\"", separator, "pattern - title");
+                printAction("\"%aa - %r - %t\"", separator, "artist - album - title");
+                printAction("\"(%y) %r - %aa - %t\"", separator, "(year) album - artist - title");
+            }
+            else
+            {
+                printAction("\"(%y) %r - %aa", separator, "(year) album - artist");
+            }
 
             Console.ForegroundColor = defaultColor;
         }
@@ -85,16 +99,21 @@ namespace UltimateMp3TaggerShell
 
             if (showHelp == false)
             {
-                bool isPatternEmpty = String.IsNullOrEmpty(pattern);
-
                 string fieldRequired = String.Empty;
 
                 bool argumentsValid = true;
 
-                if (isPatternEmpty)
+                while (String.IsNullOrEmpty(pattern))
                 {
-                    fieldRequired = "pattern (-pattern)";
-                    argumentsValid = false;
+                    Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+
+                    Console.WriteLine("Enter a valid pattern format");
+
+                    ShowPatternUsage(PATTERN_TYPE.FILE);
+
+                    Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+
+                    pattern = Console.ReadLine();
                 }
 
                 if (argumentsValid)
@@ -115,11 +134,9 @@ namespace UltimateMp3TaggerShell
             }
             else
             {
-                Console.WriteLine("umtagger.exe rename input=file pattern=pattern");
-
                 p.WriteOptionDescriptions(Console.Out);
 
-                ShowPatternUsage();
+                ShowPatternUsage(PATTERN_TYPE.FILE);
 
             }
         }
@@ -149,15 +166,51 @@ namespace UltimateMp3TaggerShell
 
                 bool argumentsValid = true;
 
-                if (isPatternEmpty)
+                while (String.IsNullOrEmpty(pattern))
                 {
-                    fieldRequired = "pattern (-pattern)";
-                    argumentsValid = false;
+                    Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+
+                    Console.WriteLine("Enter a valid pattern format");
+
+                    ShowPatternUsage(PATTERN_TYPE.FOLDER);
+
+                    Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+
+                    pattern = Console.ReadLine();
                 }
 
-                if (argumentsValid)
+                if (String.IsNullOrEmpty(referenceFile))
                 {
+                    referenceFile = "---"; // will pass on the loop at least once
+                }
+
+                while (!String.IsNullOrEmpty(referenceFile) && !File.Exists(referenceFile) )
+                {
+                    Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+
+                    Console.WriteLine("Enter a valid file reference or leave it blank to take a random mp3 file inside the target directory");
                     
+                    Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+
+                    referenceFile = Console.ReadLine();
+
+                    if (String.IsNullOrEmpty(referenceFile))
+                    {
+                        referenceFile = Directory.GetFiles(input)
+                            .FirstOrDefault((i) => {
+                                return Path.GetExtension(i).Equals(".mp3", StringComparison.InvariantCultureIgnoreCase);
+                            });
+
+                        if (String.IsNullOrEmpty(referenceFile))
+                        {
+                            argumentsValid = false;
+                            break;
+                        }
+                    }
+                }                
+
+                if (argumentsValid)
+                {                    
                     if (String.IsNullOrEmpty(referenceFile) == false && File.Exists(referenceFile))
                     {
                         string newfoldername = null;
@@ -166,7 +219,7 @@ namespace UltimateMp3TaggerShell
                     }
                     else
                     {
-                        string message = String.Format(MessageDispatcher.MESSAGE_FIELD_REQUESTED, "-ref");
+                        string message = String.Format("No valid files to read inside specified directory");
                         throw new ApplicationException(message);
                     }
                     
@@ -183,11 +236,9 @@ namespace UltimateMp3TaggerShell
             }
             else
             {
-                Console.WriteLine("umtagger.exe rename -input=folder -pattern=pattern");
-
                 p.WriteOptionDescriptions(Console.Out);
 
-                ShowPatternUsage();
+                ShowPatternUsage(PATTERN_TYPE.FOLDER);
 
             }
         }
@@ -196,9 +247,7 @@ namespace UltimateMp3TaggerShell
         {
             bool isHelpRequested = false;
             string pattern = null;
-            //string target = null;
             string refFile = null;
-            //string fileextension = DefaultExtension;
 
             var p = new OptionSet() {           
                 { "h|help", "help for this mode",
@@ -217,36 +266,28 @@ namespace UltimateMp3TaggerShell
 
             if (isHelpRequested == false)
             {
-                bool isPatternEmpty = String.IsNullOrEmpty(pattern);
                 //bool isTargetValid = new string[] { TargetFile, TargetFolder }.Contains(target);
 
                 string fieldRequired = String.Empty;
 
                 bool argumentsValid = true;
 
-                if (isPatternEmpty)
+                while (String.IsNullOrEmpty(pattern))
                 {
-                    fieldRequired = "pattern (-pattern)";
-                    argumentsValid = false;
+                    Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+
+                    Console.WriteLine("Enter a valid pattern format");
+
+                    ShowPatternUsage(PATTERN_TYPE.FILE);
+
+                    Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+
+                    pattern = Console.ReadLine();
                 }
 
                 string searchpattern = Path.GetFileName(input);
                 string folder = Path.GetDirectoryName(input);
                 
-                //while (isTargetValid == false)
-                //{                    
-                //    Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-                //    Console.WriteLine("Enter target to rename <file|dir> (default file)");
-                //    Console.ForegroundColor = MessageDispatcher.ColorAnswer;
-                //    target = Console.ReadLine();
-                //    if (String.IsNullOrEmpty(target))
-                //        target = DefaultTarget;
-                //    isTargetValid = new string[] { TargetFile, TargetFolder }.Contains(target);                    
-                    
-                //    //fieldRequired = "target (-target <file|dir>)";
-                //    //argumentsValid = false;
-                //}
-
                 if (argumentsValid)
                 {
                     string[] files = UMTShellUtility.GetFilesFromPath(folder, searchpattern, SearchOption.TopDirectoryOnly);
@@ -254,34 +295,8 @@ namespace UltimateMp3TaggerShell
                     Console.ForegroundColor = MessageDispatcher.ColorInfo;
                     Console.WriteLine(String.Format("{0} files found in path", files.Count()));
 
-                    //string newfoldername = null;
-
-                    //if (target.Equals(TargetFile))
-                        umTagger.RenameFilesByTag(files, pattern);
-                    //else
-                    //{
-                    //    if (String.IsNullOrEmpty(refFile) == false && File.Exists(refFile))
-                    //    {
-                    //        umTagger.RenameFolderByTag(path, refFile, pattern, out newfoldername);
-                    //    }
-                    //    else
-                    //    {
-                    //        string message = String.Format(MessageDispatcher.MESSAGE_FIELD_REQUESTED, "-ref");
-                    //        throw new ApplicationException(message);
-                    //    }
-
-                    //    //while (String.IsNullOrEmpty(refFile) || File.Exists(refFile))
-                    //    //{
-                    //    //    Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-                    //    //    Console.WriteLine("Enter file as tag reference");
-                    //    //    Console.ForegroundColor = MessageDispatcher.ColorAnswer;
-                    //    //    target = Console.ReadLine();
-                    //    //}
-
-                    //    //umTagger.RenameFolderByTag(path, files, pattern, out newfoldername);
-                        
-                    //}
-
+                    umTagger.RenameFilesByTag(files, pattern);
+                    
                     UMTMessage[] messages = umTagger.UnqueueMessages();
 
                     MessageDispatcher.PrintMessages(messages);
@@ -294,11 +309,9 @@ namespace UltimateMp3TaggerShell
             }
             else
             {
-                Console.WriteLine("umtagger.exe rename -input=folder -pattern=pattern");
-                
                 p.WriteOptionDescriptions(Console.Out);
 
-                ShowPatternUsage();
+                ShowPatternUsage(PATTERN_TYPE.FILE);
                 
             }
 

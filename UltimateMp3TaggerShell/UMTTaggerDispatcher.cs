@@ -1162,7 +1162,6 @@ namespace UltimateMp3TaggerShell
             }
             else
             {
-                Console.WriteLine("umtagger.exe tag input=filename [options]");
                 Console.WriteLine(Environment.NewLine);
 
                 OptionSet opt = null;
@@ -1304,7 +1303,6 @@ namespace UltimateMp3TaggerShell
 
                 Console.ForegroundColor = MessageDispatcher.ColorInfo;
 
-                Console.WriteLine("umtagger.exe tag input=folder [options]");
                 Console.WriteLine(Environment.NewLine);
 
                 OptionSet opt = null;

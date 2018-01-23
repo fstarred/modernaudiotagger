@@ -551,7 +551,7 @@ namespace UltimateMusicTagger
                     {
                         System.IO.File.Move(file, filePathNew);
 
-                        queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.INFO, String.Format("{0} was renamed to {1}", filenameOld, filenameNew)));
+                        queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.INFO, String.Format("{0} succesfully renamed to {1}", filenameOld, filenameNew)));
 
                         ret = true;
 
