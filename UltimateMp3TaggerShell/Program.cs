@@ -93,45 +93,20 @@ namespace UltimateMp3TaggerShell
 
                 if (!isHelpRequired)
                 {                    
-                    //bool isValidAction = validActionNames.Contains(action);
-
-                    //if (isValidAction == false)
-                    //    throw new ApplicationException("no valid action name was specified: <tag|rename>");
-
-                    //bool isFile = false;
-                    //bool isFolder = false;
-                    //bool isMultipleFiles = false;
-
-                    //isFolder = Directory.Exists(input);
-                    //isFile = File.Exists(input);
-
-                    //string basedir = Path.GetDirectoryName(input);
-
-                    //if (isFile == false && isFolder == false)
-                    //{
-                    //    string filter = Path.GetFileName(input);
-
-                    //    if (Directory.Exists(basedir))
-                    //    {
-                    //        try
-                    //        {
-
-                    //            if (Directory.GetFiles(basedir, filter).Length > 0)                                
-                    //                isMultipleFiles = true;
-                    //        }
-                    //        catch (Exception) { }
-                    //    }
-                    //    //else
-                    //    //    throw new ApplicationException("input is neither a valid file nor a folder");   
-                    //}
-
-
                     Func<string, IEnumerable<PATTERN_TYPE>, bool> funcValidatePath = (inp, patterns) =>
                     {
                         input = inp;
                         patternType = getPathType(inp);
                         return patterns.Contains(patternType);
                     };
+
+                    while (String.IsNullOrEmpty(action) || !validActionNames.Contains(action) )
+                    {
+                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+                        Console.WriteLine("Enter a valid action <tag|read|rename>");                        
+                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                        action = Console.ReadLine();
+                    }
 
                     if (action.Equals(ActionTag))
                     {
@@ -298,7 +273,7 @@ namespace UltimateMp3TaggerShell
                 Console.ResetColor();
             }
 
-            Console.Read();
+            //Console.Read();
         }
 
         /// <summary>
