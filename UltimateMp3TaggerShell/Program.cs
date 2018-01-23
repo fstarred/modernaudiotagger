@@ -25,6 +25,47 @@ namespace UltimateMp3TaggerShell
 
         readonly static string[] validActionNames = new string[] { ActionTag, ActionRename, ActionReadTag };
 
+        enum PATTERN_TYPE { NONE, FILE, MULTIPLE_FILES, DIRECTORY }
+
+        static PATTERN_TYPE getPathType(string input)
+        {
+            PATTERN_TYPE output = PATTERN_TYPE.NONE;
+
+            bool isFile = false;
+            bool isFolder = false;
+            bool isMultipleFiles = false;
+            try
+            {
+
+                isFolder = Directory.Exists(input);
+                isFile = File.Exists(input);
+
+                string basedir = Path.GetDirectoryName(input);
+
+                if (isFile == false && isFolder == false)
+                {
+                    string filter = Path.GetFileName(input);
+
+                    if (Directory.Exists(basedir))
+                    {
+                        if (Directory.GetFiles(basedir, filter).Length > 0)
+                            isMultipleFiles = true;
+                    }
+                }
+
+            }
+            catch (Exception)
+            {
+                // no prob
+            }
+
+            if (isFile) output = PATTERN_TYPE.FILE;
+            else if (isFolder) output = PATTERN_TYPE.DIRECTORY;
+            else if (isMultipleFiles) output = PATTERN_TYPE.MULTIPLE_FILES;
+
+            return output;
+        }
+
         /// <summary>
         /// Main
         /// </summary>
@@ -34,82 +75,37 @@ namespace UltimateMp3TaggerShell
 
             try
             {
-                if (args.Length > 0)
-                {
-                    // action
-                    string action = args[0];
+                string action = null;
+                bool isHelpRequired = false;
+                string input = null;
+                PATTERN_TYPE patternType = PATTERN_TYPE.NONE;
 
-                    bool isValidAction = validActionNames.Contains(action);
-
-                    if (isValidAction == false)
-                        throw new ApplicationException("no valid action name was specified: <tag|rename>");
-
-
-                    string input = null;
-
-                    /*
-                    var p = new OptionSet() {                    
-                        { "file=", "target file",
-                          v => file = v },
-                        { "path=", "destination folder",
-                          v => path = v },                          
-                    };
-                     * */
-                    var p = new OptionSet() {                    
-                        { "input=", "target file / directory",
-                          v => input = v },
+                var p = new OptionSet() {
+                        { "h|help", "help",
+                          v => isHelpRequired = v != null },
+                        { "a|action=", "<tag|read|rename>",
+                          v => action = v },
                     };
 
-                    p.Parse(args);
+                List<string> extra = p.Parse(args);
 
-                    // path / file argument
-                    bool isInputEmpty = String.IsNullOrEmpty(input);
+                input = extra.FirstOrDefault();
 
-                    if (isInputEmpty)
-                        throw new ApplicationException("input argument must be specified");
-
-                    //if ((isInputEmpty ^ isFileEmpty) == false)
-                    //    throw new ApplicationException("only one between path and file argument must be specified");
-
-                    // path check
-                    //if (isFileEmpty)
-                    //{
-                    //    // path mode
-                    //    if (Directory.Exists(input) == false)
-                    //        throw new ApplicationException(String.Format("path {0} does not exist", input));
-                    //}
-                    //else
-                    //{
-                    //    // file mode
-                    //    if (File.Exists(file) == false)
-                    //        throw new ApplicationException(String.Format("file {0} does not exist", file));
-                    //}
-
-                    bool isFile = false;
-                    bool isFolder = false;
-                    bool isMultipleFiles = false;
-
-                    isFolder = Directory.Exists(input);
-                    isFile = File.Exists(input);
-
-                    string basedir = Path.GetDirectoryName(input);
-
-                    if (isFile == false && isFolder == false)
+                if (!isHelpRequired)
+                {                    
+                    Func<string, IEnumerable<PATTERN_TYPE>, bool> funcValidatePath = (inp, patterns) =>
                     {
-                        string filter = Path.GetFileName(input);
+                        input = inp;
+                        patternType = getPathType(inp);
+                        return patterns.Contains(patternType);
+                    };
 
-                        if (Directory.Exists(basedir))
-                        {
-                            try
-                            {
-
-                                if (Directory.GetFiles(basedir, filter).Length > 0)                                
-                                    isMultipleFiles = true;
-                            }
-                            catch (Exception) { }
-                        }
-                        else
-                            throw new ApplicationException("input is neither a valid file nor a folder");   
+                    while (String.IsNullOrEmpty(action) || !validActionNames.Contains(action) )
+                    {
+                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+                        Console.WriteLine("Enter a valid action <tag|read|rename>");                        
+                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                        action = Console.ReadLine();
                     }
 
                     if (action.Equals(ActionTag))
@@ -145,14 +141,33 @@ namespace UltimateMp3TaggerShell
                         // tag mode
                         UMTTaggerDispatcher umtTaggerDelegate = new UMTTaggerDispatcher(proxy);
 
-                        Action<string[], string> tagAction = null;
+                        IEnumerable<PATTERN_TYPE> patns = new PATTERN_TYPE[] {
+                                PATTERN_TYPE.FILE,
+                                PATTERN_TYPE.MULTIPLE_FILES
+                            };
 
-                        if (isFile)
-                            tagAction = umtTaggerDelegate.TagFile;
-                        else if (isMultipleFiles)
-                            tagAction = umtTaggerDelegate.TagPath;
-                        else
-                            throw new ApplicationException("Input must be a file or a directory followed by a search pattern (eg. *.mp3)");
+                        while (!funcValidatePath(input, patns))
+                        {
+                            Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+                            Console.WriteLine("Enter a valid file path or pattern (ex. /D/Music/*mp3)");
+                            Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                            input = Console.ReadLine();
+                        }
+
+                        Action<string[], string> tagAction;
+                        
+                        switch (patternType)
+                        {
+                            case PATTERN_TYPE.FILE:
+                                tagAction = umtTaggerDelegate.TagFile;
+                                break;
+                            case PATTERN_TYPE.MULTIPLE_FILES:
+                                tagAction = umtTaggerDelegate.TagPath;
+                                break;
+                            default:
+                                tagAction = null;
+                                break;
+                        }
 
                         tagAction(args, input);
 
@@ -165,34 +180,76 @@ namespace UltimateMp3TaggerShell
 
                         Action<string[], string> renameAction = null;
 
-                        if (isFile)
-                            renameAction = umtTaggerRenamer.RenameFile;
-                        else if (isMultipleFiles)
-                            renameAction = umtTaggerRenamer.RenameFilesInPath;
-                        else if (isFolder)
-                            renameAction = umtTaggerRenamer.RenameFolder;
+                        IEnumerable<PATTERN_TYPE> patns = new PATTERN_TYPE[] {
+                                PATTERN_TYPE.FILE,
+                                PATTERN_TYPE.MULTIPLE_FILES,
+                                PATTERN_TYPE.DIRECTORY
+                            };
 
-                        //Action<string[], string> renameAction = isFolder ?
-                        //    (Action<string[], string>)umtTaggerRenamer.RenameFilesInPath :
-                        //    umtTaggerRenamer.RenameFile;
-
+                        while (!funcValidatePath(input, patns))
+                        {
+                            Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+                            Console.WriteLine("Enter a valid file, directory, or pattern (ex. /D/Music/*.mp3)");
+                            Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                            input = Console.ReadLine();
+                        }
+                        
+                        switch (patternType)
+                        {
+                            case PATTERN_TYPE.FILE:
+                                renameAction = umtTaggerRenamer.RenameFile;
+                                break;
+                            case PATTERN_TYPE.MULTIPLE_FILES:
+                                renameAction = umtTaggerRenamer.RenameFilesInPath;
+                                break;
+                            case PATTERN_TYPE.DIRECTORY:
+                                renameAction = umtTaggerRenamer.RenameFolder;
+                                break;
+                            default:
+                                renameAction = null;
+                                break;
+                        }
+                        
                         renameAction(args, input);
                     }
                     else if (action.Equals(ActionReadTag))
                     {
                         UMTTaggerDispatcher umtTaggerDelegate = new UMTTaggerDispatcher(null);
 
-                        if (isFile)
-                            umtTaggerDelegate.ReadTagFromSingleFile(args, input);
-                        else if (isMultipleFiles)
-                            umtTaggerDelegate.ReadTagFromMultipleFile(args, input);
-                        else
-                            throw new ApplicationException("Input must be a file or a directory followed by a search pattern (eg. *.mp3)");
+                        IEnumerable<PATTERN_TYPE> patns = new PATTERN_TYPE[] {
+                                PATTERN_TYPE.FILE,
+                                PATTERN_TYPE.MULTIPLE_FILES
+                            };
 
+                        while (!funcValidatePath(input, patns))
+                        {
+                            Console.ForegroundColor = MessageDispatcher.ColorQuestion;
+                            Console.WriteLine("Enter a valid file path or pattern (ex. /D/Music/*.mp3)");
+                            Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                            input = Console.ReadLine();
+                        }
+
+                        Action<string[], string> readAction = null;
+
+                        switch (patternType)
+                        {
+                            case PATTERN_TYPE.FILE:
+                                readAction = umtTaggerDelegate.ReadTagFromSingleFile;
+                                break;
+                            case PATTERN_TYPE.MULTIPLE_FILES:
+                                readAction = umtTaggerDelegate.ReadTagFromMultipleFile;
+                                break;
+                            default:
+                                readAction = null;
+                                break;
+                        }
+
+                        readAction(args, input);
+                        
                     }
                 }
                 else
-                    PrintGeneralUsage(new OptionSet());
+                    PrintGeneralUsage(args.FirstOrDefault(), p);
 
             }
             catch (ApplicationException e)
@@ -223,12 +280,12 @@ namespace UltimateMp3TaggerShell
         /// PrintUsage
         /// </summary>
         /// <param name="p"></param>
-        private static void PrintGeneralUsage(OptionSet p)
+        private static void PrintGeneralUsage(string program, OptionSet p)
         {
             Console.ForegroundColor = MessageDispatcher.ColorInfo;
 
             Console.WriteLine("Ultimate Music Tagger usage:\n");
-            Console.WriteLine("UMTagger.exe <tag|rename|read> <-input> [options]");
+            Console.WriteLine(String.Format("{0} <input> -action <value> [options]", program));
 
             p.WriteOptionDescriptions(Console.Out);
 
