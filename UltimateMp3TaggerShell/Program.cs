@@ -11,6 +11,7 @@ using System.Xml;
 using UltimateMusicTagger;
 using UltimateMusicTagger.Business;
 using UltimateMusicTagger.Model;
+using static UltimateMp3TaggerShell.UMTShellUtility;
 
 namespace UltimateMp3TaggerShell
 {
@@ -24,9 +25,7 @@ namespace UltimateMp3TaggerShell
         const string ActionReadTag = "read";
 
         readonly static string[] validActionNames = new string[] { ActionTag, ActionRename, ActionReadTag };
-
-        enum PATTERN_TYPE { NONE, FILE, MULTIPLE_FILES, DIRECTORY }
-
+        
         static PATTERN_TYPE getPathType(string input)
         {
             PATTERN_TYPE output = PATTERN_TYPE.NONE;
@@ -83,7 +82,7 @@ namespace UltimateMp3TaggerShell
                 var p = new OptionSet() {
                         { "h|help", "help",
                           v => isHelpRequired = v != null },
-                        { "a|action=", "<tag|read|rename>",
+                        { "action=", "<tag|read|rename>",
                           v => action = v },
                     };
 
@@ -93,11 +92,11 @@ namespace UltimateMp3TaggerShell
 
                 if (!isHelpRequired)
                 {                    
-                    Func<string, IEnumerable<PATTERN_TYPE>, bool> funcValidatePath = (inp, patterns) =>
+                    Func<string, PATTERN_TYPE, bool> funcValidatePath = (inp, patterns) =>
                     {
                         input = inp;
                         patternType = getPathType(inp);
-                        return patterns.Contains(patternType);
+                        return (patternType & patterns) != 0;
                     };
 
                     while (String.IsNullOrEmpty(action) || !validActionNames.Contains(action) )
@@ -141,16 +140,16 @@ namespace UltimateMp3TaggerShell
                         // tag mode
                         UMTTaggerDispatcher umtTaggerDelegate = new UMTTaggerDispatcher(proxy);
 
-                        IEnumerable<PATTERN_TYPE> patns = new PATTERN_TYPE[] {
-                                PATTERN_TYPE.FILE,
-                                PATTERN_TYPE.MULTIPLE_FILES
-                            };
+                        PATTERN_TYPE patns = 
+                            PATTERN_TYPE.FILE | 
+                            PATTERN_TYPE.MULTIPLE_FILES;
 
                         while (!funcValidatePath(input, patns))
                         {
-                            Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-                            Console.WriteLine("Enter a valid file path or pattern (ex. /D/Music/*mp3)");
-                            Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                            MessageDispatcher.PromptPath(
+                                PATTERN_TYPE.FILE | 
+                                PATTERN_TYPE.MULTIPLE_FILES
+                            );
                             input = Console.ReadLine();
                         }
 
@@ -180,17 +179,14 @@ namespace UltimateMp3TaggerShell
 
                         Action<string[], string> renameAction = null;
 
-                        IEnumerable<PATTERN_TYPE> patns = new PATTERN_TYPE[] {
-                                PATTERN_TYPE.FILE,
-                                PATTERN_TYPE.MULTIPLE_FILES,
-                                PATTERN_TYPE.DIRECTORY
-                            };
+                        PATTERN_TYPE patns =
+                            PATTERN_TYPE.FILE |
+                            PATTERN_TYPE.MULTIPLE_FILES |
+                            PATTERN_TYPE.DIRECTORY;
 
                         while (!funcValidatePath(input, patns))
                         {
-                            Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-                            Console.WriteLine("Enter a valid file, directory, or pattern (ex. /D/Music/*.mp3)");
-                            Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                            MessageDispatcher.PromptPath(patns);
                             input = Console.ReadLine();
                         }
                         
@@ -216,16 +212,13 @@ namespace UltimateMp3TaggerShell
                     {
                         UMTTaggerDispatcher umtTaggerDelegate = new UMTTaggerDispatcher(null);
 
-                        IEnumerable<PATTERN_TYPE> patns = new PATTERN_TYPE[] {
-                                PATTERN_TYPE.FILE,
-                                PATTERN_TYPE.MULTIPLE_FILES
-                            };
+                        PATTERN_TYPE patns =
+                            PATTERN_TYPE.FILE | 
+                            PATTERN_TYPE.MULTIPLE_FILES;
 
                         while (!funcValidatePath(input, patns))
                         {
-                            Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-                            Console.WriteLine("Enter a valid file path or pattern (ex. /D/Music/*.mp3)");
-                            Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                            MessageDispatcher.PromptPath(patns);
                             input = Console.ReadLine();
                         }
 

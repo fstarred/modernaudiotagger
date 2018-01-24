@@ -9,6 +9,16 @@ namespace UltimateMp3TaggerShell
 {
     class UMTShellUtility
     {
+
+        [Flags]
+        public enum PATTERN_TYPE
+        {
+            NONE = 0,
+            FILE = 1,
+            MULTIPLE_FILES = 2,
+            DIRECTORY = 4
+        }
+
         public static string NormalizeFilterPath(string filter)
         {
             string result = null;

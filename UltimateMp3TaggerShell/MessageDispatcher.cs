@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UltimateMusicTagger;
 using UltimateMusicTagger.Model;
+using static UltimateMp3TaggerShell.UMTShellUtility;
 
 namespace UltimateMp3TaggerShell
 {
@@ -81,7 +82,29 @@ namespace UltimateMp3TaggerShell
 
             Console.ForegroundColor = oldColor;
         }
-        
+
+        public static void PromptPath(PATTERN_TYPE type)
+        {
+            Console.ForegroundColor = ColorQuestion;
+
+            Console.WriteLine("Enter a valid input from:");
+
+            if ((type & PATTERN_TYPE.FILE) == PATTERN_TYPE.FILE)
+            {
+                Console.WriteLine("- File (ex. /music/foo.mp3)");
+            }
+            if ((type & PATTERN_TYPE.MULTIPLE_FILES) == PATTERN_TYPE.MULTIPLE_FILES)
+            {
+                Console.WriteLine("- More files (ex. /music/*.mp3)");
+            }
+            if ((type & PATTERN_TYPE.DIRECTORY) == PATTERN_TYPE.DIRECTORY)
+            {
+                Console.WriteLine("- Directory (ex. /music/album)");
+            }
+
+            Console.ForegroundColor = ColorAnswer;
+        }
+
         public static void PrintTrackMatch(FILENAME_MATCH mode)
         {
             ConsoleColor oldColor = Console.ForegroundColor;
