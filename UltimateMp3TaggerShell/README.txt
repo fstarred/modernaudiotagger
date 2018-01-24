@@ -1,6 +1,6 @@
 ﻿Ultimate Music Tagger
-by Fabrizio Stellato
-http://umtagger.codeplex.com/
+by Starred MediaSoft
+https://fstarred.github.io/modernaudiotagger/
 
 Possible usage for command line:
 
