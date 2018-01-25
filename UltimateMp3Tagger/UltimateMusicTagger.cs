@@ -646,12 +646,12 @@ namespace UltimateMusicTagger
             // year
             rgx = new Regex(PatternYear, RegexOptions.IgnoreCase);
 
-            filenameReplaced = rgx.Replace(filenameReplaced, tagFile.Tag.Year != null ? tagFile.Tag.Year.ToString() : String.Empty);
+            filenameReplaced = rgx.Replace(filenameReplaced, tagFile.Tag.Year.ToString());
 
             // position
             rgx = new Regex(PatternPos, RegexOptions.IgnoreCase);
 
-            filenameReplaced = rgx.Replace(filenameReplaced, tagFile.Tag.Track != null ? tagFile.Tag.Track.ToString("D2") : String.Empty);
+            filenameReplaced = rgx.Replace(filenameReplaced, tagFile.Tag.Track.ToString("D2"));
 
             // replace illegal characters
             filenameReplaced = Path.GetInvalidFileNameChars().Aggregate(filenameReplaced, (current, c) => current.Replace(c.ToString(), string.Empty));
