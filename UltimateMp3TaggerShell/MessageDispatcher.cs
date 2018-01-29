@@ -21,30 +21,11 @@ namespace UltimateMp3TaggerShell
 
         public static void PrintMessages(UMTMessage[] messages)
         {
-            ConsoleColor oldColor = Console.ForegroundColor;
-            
             foreach (UMTMessage msg in messages)
             {
-                ConsoleColor color = ColorInfo;
-                switch (msg.TypeMsg)
-                {
-
-                    case UMTMessage.M_TYPE.INFO:
-                        color = ColorInfo;
-                        break;
-                    case UMTMessage.M_TYPE.ERROR:
-                        color = ColorError;
-                        break;
-                    case UMTMessage.M_TYPE.WARNING:
-                        color = ColorWarning;
-                        break;
-                }
-
-                Console.ForegroundColor = color;
                 Console.WriteLine(msg.Message);
             }
-
-            Console.ForegroundColor = oldColor;
+            
         }
 
         public static void PrintParameters(ModelTag input)
@@ -71,22 +52,15 @@ namespace UltimateMp3TaggerShell
             sb.Append(message2("track position", input.Position));
             sb.Append(message("genres", input.Genres != null ? input.Genres.ToString() : null));
             sb.Append(message2("year", input.Year));
-
-            ConsoleColor oldColor = Console.ForegroundColor;
-
-            Console.ForegroundColor = ColorInfo;
+            
             Console.WriteLine("INPUT PARAMETERS");
             Console.Write(Environment.NewLine);
             Console.WriteLine(sb.ToString());
-            Console.Write(Environment.NewLine);
-
-            Console.ForegroundColor = oldColor;
+            Console.Write(Environment.NewLine);            
         }
 
         public static void PromptPath(PATTERN_TYPE type)
         {
-            Console.ForegroundColor = ColorQuestion;
-
             Console.WriteLine("Enter a valid input from:");
 
             if ((type & PATTERN_TYPE.FILE) == PATTERN_TYPE.FILE)
@@ -101,15 +75,11 @@ namespace UltimateMp3TaggerShell
             {
                 Console.WriteLine("- Directory (ex. /music/album)");
             }
-
-            Console.ForegroundColor = ColorAnswer;
+            
         }
 
         public static void PrintTrackMatch(FILENAME_MATCH mode)
         {
-            ConsoleColor oldColor = Console.ForegroundColor;
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("track match mode:");
 
             string seekMode = null;
@@ -126,15 +96,11 @@ namespace UltimateMp3TaggerShell
             }
 
             Console.WriteLine(seekMode);
-
-            Console.ForegroundColor = oldColor;
+            
         }
 
         public static void PrintTagMode(TAG_FIELDS mode)
         {
-            ConsoleColor oldColor = Console.ForegroundColor;
-            
-            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("tag mode");
 
             StringBuilder sb = new StringBuilder();
@@ -185,9 +151,7 @@ namespace UltimateMp3TaggerShell
             sb.Append(Environment.NewLine);
             
             Console.WriteLine(sb.ToString());
-
-            Console.ForegroundColor = oldColor;
-
+            
         }
 
 
