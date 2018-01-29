@@ -5,12 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Xml;
-using UltimateMusicTagger;
-using UltimateMusicTagger.Business;
-using UltimateMusicTagger.Model;
 using static UltimateMp3TaggerShell.UMTShellUtility;
 
 namespace UltimateMp3TaggerShell
@@ -81,17 +76,16 @@ namespace UltimateMp3TaggerShell
 
                 var p = new OptionSet() {
                         { "h|help", "help",
-                          v => isHelpRequired = v != null },
-                        { "action=", "<tag|read|rename>",
-                          v => action = v },
+                          v => isHelpRequired = v != null }                        
                     };
 
                 List<string> extra = p.Parse(args);
 
-                input = extra.FirstOrDefault();
+                if (extra.Count > 1)
+                {
+                    action = extra.FirstOrDefault();
+                    input = extra.Count() > 1 ? extra[1] : null;
 
-                if (!isHelpRequired)
-                {                    
                     Func<string, PATTERN_TYPE, bool> funcValidatePath = (inp, patterns) =>
                     {
                         input = inp;
@@ -101,9 +95,7 @@ namespace UltimateMp3TaggerShell
 
                     while (String.IsNullOrEmpty(action) || !validActionNames.Contains(action) )
                     {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                         Console.WriteLine("Enter a valid action <tag|read|rename>");                        
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                         action = Console.ReadLine();
                     }
 
@@ -118,23 +110,17 @@ namespace UltimateMp3TaggerShell
 
                             if (proxy != null)
                             {
-                                Console.ForegroundColor = MessageDispatcher.ColorInfo;
-                                Console.WriteLine("using proxy");
-                                Console.ResetColor();
+                                Console.WriteLine("using proxy");                                
                             }
                         }
-                        catch (FileNotFoundException e)
+                        catch (FileNotFoundException)
                         {
-                            Console.ForegroundColor = MessageDispatcher.ColorWarning;
-                            Console.WriteLine("file umtagger.ini not found, running with default settings");
-                            Console.ResetColor();
+                            Console.WriteLine("file umtagger.ini not found, running with default settings");                            
                         }
                         catch (Exception e)
                         {
-                            Console.ForegroundColor = MessageDispatcher.ColorWarning;
                             Console.WriteLine("some errors were reported while reading umtagger.ini");
                             Console.WriteLine(e.Message);
-                            Console.ResetColor();
                         }
 
                         // tag mode
@@ -169,8 +155,7 @@ namespace UltimateMp3TaggerShell
                         }
 
                         tagAction(args, input);
-
-                        Console.ForegroundColor = MessageDispatcher.ColorInfo;
+                        
                     }
                     else if (action.Equals(ActionRename))
                     {
@@ -199,7 +184,7 @@ namespace UltimateMp3TaggerShell
                                 renameAction = umtTaggerRenamer.RenameFilesInPath;
                                 break;
                             case PATTERN_TYPE.DIRECTORY:
-                                renameAction = umtTaggerRenamer.RenameFolder;
+                                renameAction = umtTaggerRenamer.RenameDirectory;
                                 break;
                             default:
                                 renameAction = null;
@@ -247,23 +232,19 @@ namespace UltimateMp3TaggerShell
             }
             catch (ApplicationException e)
             {
-                Console.ForegroundColor = MessageDispatcher.ColorWarning;
                 Console.WriteLine(e.Message);
             }
             catch (OptionException e)
             {
-                Console.ForegroundColor = MessageDispatcher.ColorWarning;
                 Console.WriteLine(e.Message);
             }
             catch (Exception e)
             {
-                Console.ForegroundColor = MessageDispatcher.ColorFatal;
                 Console.WriteLine(e);
             }
             finally
             {
                 Thread.Sleep(300); // this is bad trick to dequeque last messages
-                Console.ResetColor();
             }
 
             //Console.Read();
@@ -275,14 +256,13 @@ namespace UltimateMp3TaggerShell
         /// <param name="p"></param>
         private static void PrintGeneralUsage(string program, OptionSet p)
         {
-            Console.ForegroundColor = MessageDispatcher.ColorInfo;
+            Console.WriteLine("Ultimate Music Tagger information");            
+            Console.WriteLine(String.Format("Version: {0}", UMTShellUtility.GetFileVersion(System.Reflection.Assembly.GetExecutingAssembly()).FileVersion));
+            Console.WriteLine("Usage:");
+            Console.Write(Environment.NewLine);
+            Console.WriteLine(String.Format("{0} <tag|read|rename> <path> [options]", program));            
 
-            Console.WriteLine("Ultimate Music Tagger usage:\n");
-            Console.WriteLine(String.Format("{0} <input> -action <value> [options]", program));
-
-            p.WriteOptionDescriptions(Console.Out);
-
-            Console.ResetColor();
+            p.WriteOptionDescriptions(Console.Out);            
         }
 
 
@@ -296,7 +276,7 @@ namespace UltimateMp3TaggerShell
 
             //try
             //{
-            IConfigSource configSource = new IniConfigSource("umtagger.ini");
+            IConfigSource configSource = new IniConfigSource(Path.Combine(UMTShellUtility.GetPathFromAssembly(System.Reflection.Assembly.GetExecutingAssembly()), "umtagger.ini"));
 
             IConfig configSection = configSource.Configs["Proxy"];
 

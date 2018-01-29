@@ -44,5 +44,19 @@ namespace UltimateMp3TaggerShell
 
             return files;
         }
+
+        public static string GetPathFromAssembly(System.Reflection.Assembly assembly)
+        {
+            string codeBase = assembly.CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            string path = Uri.UnescapeDataString(uri.Path);
+            return Path.GetDirectoryName(path);
+        }
+
+        public static System.Diagnostics.FileVersionInfo GetFileVersion(System.Reflection.Assembly assembly)
+        {
+            System.Diagnostics.FileVersionInfo output = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+            return output;
+        }
     }
 }

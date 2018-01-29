@@ -186,10 +186,8 @@ namespace UltimateMp3TaggerShell
                 {
                     if (String.IsNullOrEmpty(tagmode))
                     {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-                        Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL>");
-                        Console.WriteLine("Please note: t, i, p, m tag will be erased if selected");
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                        Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL (r, R, T, g, y)>");
+                        Console.WriteLine("Please note: the following tag will be erased if specified: t (title), i (image), p (position), m (mbid)");
                         tagmode = Console.ReadLine();
                     }
 
@@ -200,7 +198,6 @@ namespace UltimateMp3TaggerShell
                     if (isTagModeAll)
                     {
                         tagfields ^= TAG_FIELDS.TITLE;
-                        tagfields ^= TAG_FIELDS.IMAGE;
                         tagfields ^= TAG_FIELDS.MUSICBRAINZ_ID;
                         tagfields ^= TAG_FIELDS.TRACK_POS;
                     }
@@ -219,25 +216,19 @@ namespace UltimateMp3TaggerShell
             // album
             if (((tagfields & TAG_FIELDS.ALBUM) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(album))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter album (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 album = Console.ReadLine();
             }
             // album artist
             if (((tagfields & TAG_FIELDS.ALBUM_ARTIST) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(albumArtists))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter album artist  (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 albumArtists = Console.ReadLine();
             }
             // track artist
             if (((tagfields & TAG_FIELDS.TRACK_ARTIST) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(trackArtists))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter track artist  (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 trackArtists = Console.ReadLine();
             }
             // year
@@ -248,9 +239,7 @@ namespace UltimateMp3TaggerShell
                 {
                     if (isValid == false)
                     {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;                        
                         Console.WriteLine("Enter year (leave blank to delete it)");
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                         year = Console.ReadLine();
                         if (String.IsNullOrEmpty(year))
                             year = "0";
@@ -262,35 +251,21 @@ namespace UltimateMp3TaggerShell
             // genres
             if (((tagfields & TAG_FIELDS.GENRES) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(genres))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter genres, comma separated (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 genres = Console.ReadLine();
             }
-            // image path
-            if (((tagfields & TAG_FIELDS.IMAGE) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(imagepath))
-            {                
-                bool isValid = true;
-                do
-                {
-                    if (isValid == false)
-                    {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-                        Console.WriteLine("Enter image path for applying as front cover (leave blank to delete it)");
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
-                        imagepath = Console.ReadLine();
-                    }                    
-                    isValid = (String.IsNullOrEmpty(imagepath) || File.Exists(imagepath));
-                    if (String.IsNullOrEmpty(imagepath))
-                        isValid = true;
-                    else
-                    {
-                        picture = Image.FromFile(imagepath);
-                        isValid = false;
-                    }
 
+            if (String.IsNullOrEmpty(imagepath))
+                imagepath = "---";
+
+            // image path
+            if (((tagfields & TAG_FIELDS.IMAGE) != TAG_FIELDS.NONE))
+            {
+                while (!File.Exists(imagepath))                 {                    
+                    Console.WriteLine("Enter image path for applying as front cover (leave blank to delete it)");
+                    imagepath = Console.ReadLine();                    
                 }
-                while (isValid == false);
+                picture = Image.FromFile(imagepath);
             }
 
             ModelTag input = new ModelTag
@@ -314,126 +289,22 @@ namespace UltimateMp3TaggerShell
 
             isTaggerProcessEnd = true;
         }
-
-        //[Obsolete(null , true)]
-        //private void TagPathManually(string[] files, string tagmode, InputTag input)
-        //{
-            
-        //    TAG_FIELDS tagfield = TAG_FIELDS.NONE;
-
-        //    // tagmode            
-        //    bool isValidTagMode = false;
-
-        //    do
-        //    {
-        //        try
-        //        {
-        //            if (String.IsNullOrEmpty(tagmode))
-        //            {
-        //                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //                Console.WriteLine("Enter tag mode <a r t g y i m | ALL>");
-        //                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
-        //                tagmode = Console.ReadLine();
-        //            }
-
-        //            tagfield = ParseTagMode(tagmode);
-
-        //            isValidTagMode = String.IsNullOrEmpty(tagmode) == false;
-
-        //        }
-        //        catch (ApplicationException)
-        //        {
-        //            tagmode = String.Empty;
-        //        }
-
-        //    }
-        //    while (isValidTagMode == false);
-
-        //    // album
-        //    if (((tagfield & TAG_FIELDS.ALBUM) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(input.Album))
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter album (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
-        //        input.Album = Console.ReadLine();
-        //    }
-
-        //    // artist
-        //    if (((tagfield & TAG_FIELDS.ALBUM_ARTIST) != TAG_FIELDS.NONE) && input.AlbumArtists != null)
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter artist  (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
-        //        input.AlbumArtists = Console.ReadLine().Split(',');
-        //    }
-        //    // year
-        //    if (((tagfield & TAG_FIELDS.YEAR) != TAG_FIELDS.NONE) && input.Year == 0)
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter year (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
-        //        string inputYear = Console.ReadLine();
-        //        uint year;
-        //        UInt32.TryParse(inputYear, out year);
-        //        input.Year = year;
-        //    }      
-        //    // genres
-        //    if (((tagfield & TAG_FIELDS.GENRES) != TAG_FIELDS.NONE) && (input.Genres == null || input.Genres.Length == 0))
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter genres, comma separated (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;              
-        //        string inputGenres = Console.ReadLine();
-        //        string[] genres = inputGenres.Split(',').Select(z => z.Trim()).ToArray();
-        //        input.Genres = genres;
-        //    }
-        //    // image path
-        //    if (((tagfield & TAG_FIELDS.IMAGE) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(input.ImagePath))
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter image path for applying as front cover (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;     
-        //        bool isValidPath = true;
-        //        do
-        //        {
-        //            if (isValidPath == false)
-        //            {
-        //                Console.ForegroundColor = ConsoleColor.Red;
-        //                Console.WriteLine("enter a valid image path (or blank to remove tag)");
-        //            }
-        //            input.ImagePath = Console.ReadLine();
-        //            isValidPath = (String.IsNullOrEmpty(input.ImagePath) || File.Exists(input.ImagePath));
-        //        }
-        //        while (isValidPath == false);
-        //    }
-
-        //    MessageDispatcher.PrintTagMode(tagfield);
-
-        //    Task.Factory.StartNew(PrintMessages);
-
-        //    umTagger.TagFiles(files, input, tagfield);
-
-        //    isTaggerProcessEnd = true;
-
-        //}
-
+        
         private void PrintMessages()
-        {            
+        {
             // this bool allows to print last message in queue after main process is end
             bool hasProcessEnd = false;
 
-            while (hasProcessEnd == false) 
-            {                
+            while (hasProcessEnd == false)
+            {
                 hasProcessEnd = isTaggerProcessEnd;
                 UMTMessage[] messages = umTagger.UnqueueMessages();
                 MessageDispatcher.PrintMessages(messages);
-                Thread.Sleep(300);                
+                Thread.Sleep(300);
             }
 
             Console.Write(Environment.NewLine);
-            Console.ForegroundColor = MessageDispatcher.ColorInfo;
             Console.WriteLine("END");
-            Console.ResetColor();
         }
 
 
@@ -475,9 +346,7 @@ namespace UltimateMp3TaggerShell
                 {
                     if (String.IsNullOrEmpty(tagmode))
                     {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                         Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL>");
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                         tagmode = Console.ReadLine();
                     }
 
@@ -497,33 +366,25 @@ namespace UltimateMp3TaggerShell
             // title
             if (((tagfields & TAG_FIELDS.TITLE) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(title))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter title (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 title = Console.ReadLine();
             }
             // album
             if (((tagfields & TAG_FIELDS.ALBUM) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(album))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter album (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 album = Console.ReadLine();
             }
             // album artist
             if (((tagfields & TAG_FIELDS.ALBUM_ARTIST) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(albumArtists))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter album artists  (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 albumArtists = Console.ReadLine();
             }
             // track artist
             if (((tagfields & TAG_FIELDS.TRACK_ARTIST) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(trackArtists))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter track artists (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 trackArtists = Console.ReadLine();
             }
             // year
@@ -534,9 +395,7 @@ namespace UltimateMp3TaggerShell
                 {
                     if (isValid == false)
                     {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;                        
                         Console.WriteLine("Enter year (leave blank to delete it)");
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                         year = Console.ReadLine();
                         if (String.IsNullOrEmpty(year))
                             year = "0";
@@ -551,11 +410,9 @@ namespace UltimateMp3TaggerShell
                 bool isValid = true;
                 do
                 {
-                    if (isValid == false)
+                    if (!isValid)
                     {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                         Console.WriteLine("Enter track position (leave blank to delete it)");
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                         position = Console.ReadLine();
                         if (String.IsNullOrEmpty(position))
                             position = "0";
@@ -567,9 +424,7 @@ namespace UltimateMp3TaggerShell
             // genres
             if (((tagfields & TAG_FIELDS.GENRES) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(genres))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter genres, comma separated (leave blank to delete it)");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 //string inputGenres = Console.ReadLine();
                 //string[] genres = inputGenres.Split(',').Select(z => z.Trim()).ToArray();
                 //input.Genres = genres;
@@ -583,9 +438,7 @@ namespace UltimateMp3TaggerShell
                 {
                     if (isValid == false)
                     {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                         Console.WriteLine("Enter image path for applying as front cover (leave blank to delete it)");
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                         imagepath = Console.ReadLine();
                     }                    
                     isValid = (String.IsNullOrEmpty(imagepath) || File.Exists(imagepath));
@@ -622,129 +475,7 @@ namespace UltimateMp3TaggerShell
             MessageDispatcher.PrintMessages(messages);
 
         }
-
         
-        //[Obsolete(null, true)]
-        //private void TagFileManually(string file, string tagmode, InputTag input)
-        //{
-        //    TAG_FIELDS tagfields = TAG_FIELDS.NONE;
-
-        //    // tagmode            
-        //    bool isValidTagMode = false;
-
-        //    do
-        //    {
-        //        try
-        //        {
-        //            if (String.IsNullOrEmpty(tagmode))
-        //            {
-        //                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //                Console.WriteLine("Enter tag mode <a r t g y i m | ALL>");
-        //                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
-        //                tagmode = Console.ReadLine();
-        //            }
-
-        //            tagfields = ParseTagMode(tagmode);
-
-        //            isValidTagMode = String.IsNullOrEmpty(tagmode) == false;
-
-        //        }
-        //        catch (ApplicationException)
-        //        {
-        //            tagmode = String.Empty;
-        //        }
-
-        //    }
-        //    while (isValidTagMode == false);
-
-        //    // title
-        //    if (((tagfields & TAG_FIELDS.TITLE) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(input.Title))
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;     
-        //        Console.WriteLine("Enter title (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;     
-        //        input.Title = Console.ReadLine();
-        //    }
-        //    // album
-        //    if (((tagfields & TAG_FIELDS.ALBUM) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(input.Album))
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter album (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;     
-        //        input.Album = Console.ReadLine();
-        //    }
-        //    // artist
-        //    if (((tagfields & TAG_FIELDS.ALBUM_ARTIST) != TAG_FIELDS.NONE) && input.AlbumArtists != null)
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter artist  (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;     
-        //        input.AlbumArtists = Console.ReadLine().Split(',');
-        //    }
-        //    // year
-        //    if (((tagfields & TAG_FIELDS.YEAR) != TAG_FIELDS.NONE) && input.Year == 0)
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter year (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;     
-        //        string inputYear = Console.ReadLine();
-        //        uint year;
-        //        UInt32.TryParse(inputYear, out year);
-        //        input.Year = year;
-        //    }
-        //    // year
-        //    if (((tagfields & TAG_FIELDS.TRACK_POS) != TAG_FIELDS.NONE) && input.Position == 0)
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter track position (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;     
-        //        string inputPosition = Console.ReadLine();
-        //        uint position;
-        //        UInt32.TryParse(inputPosition, out position);
-        //        input.Position = position;
-        //    }
-        //    // genres
-        //    if (((tagfields & TAG_FIELDS.GENRES) != TAG_FIELDS.NONE) && (input.Genres == null || input.Genres.Length == 0))
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter genres, comma separated (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;     
-        //        string inputGenres = Console.ReadLine();
-        //        string[] genres = inputGenres.Split(',').Select(z => z.Trim()).ToArray();
-        //        input.Genres = genres;
-        //    }
-        //    // image path
-        //    if (((tagfields & TAG_FIELDS.IMAGE) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(input.ImagePath))
-        //    {
-        //        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-        //        Console.WriteLine("Enter image path for applying as front cover (leave blank to delete it)");
-        //        Console.ForegroundColor = MessageDispatcher.ColorAnswer;     
-        //        bool isValidPath = true;
-        //        do
-        //        {
-        //            if (isValidPath == false)
-        //            {
-        //                Console.ForegroundColor = ConsoleColor.Red;
-        //                Console.WriteLine("enter a valid image path (or blank to remove tag)");
-        //            }
-        //            input.ImagePath = Console.ReadLine();
-        //            isValidPath = (String.IsNullOrEmpty(input.ImagePath) || File.Exists(input.ImagePath));
-        //        }
-        //        while (isValidPath == false);
-        //    }
-
-        //    MessageDispatcher.PrintTagMode(tagfields);
-
-        //    string[] files = new string[] { file };
-
-        //    umTagger.TagFiles(files, input, tagfields);
-
-        //    UMTMessage[] messages = umTagger.GetMessageQueue();
-
-        //    MessageDispatcher.PrintMessages(messages);
-          
-        //}
-
         private void TagPathLastfm(string[] files, string album, string artist, string tagmode, char seekmode)
         {
             TAG_FIELDS tagfields = TAG_FIELDS.NONE;
@@ -754,18 +485,14 @@ namespace UltimateMp3TaggerShell
             // album
             while (String.IsNullOrEmpty(album))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter album to find");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 album = Console.ReadLine();
             }
 
             // artist
             while (String.IsNullOrEmpty(artist))
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter artist to find");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 artist = Console.ReadLine();
             }
 
@@ -777,9 +504,7 @@ namespace UltimateMp3TaggerShell
                 string trackmatch = String.Empty;
                 if (seekmode == ' ')
                 {
-                    Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                     Console.WriteLine("Enter track/filename match algo <p|n>");
-                    Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                     trackmatch = Console.ReadLine();
                 }
 
@@ -808,9 +533,7 @@ namespace UltimateMp3TaggerShell
                 {
                     if (String.IsNullOrEmpty(tagmode))
                     {
-                        Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                         Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL>");
-                        Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                         tagmode = Console.ReadLine();
                     }
 
@@ -826,8 +549,6 @@ namespace UltimateMp3TaggerShell
 
             }
             while (isValidTagMode == false);
-
-            Console.ResetColor();
 
             // start tagging
             MessageDispatcher.PrintParameters(new ModelTag { AlbumArtists = artist.Split(','), Album = album });
@@ -846,9 +567,7 @@ namespace UltimateMp3TaggerShell
             }
             catch (Exception e)
             {
-                Console.ForegroundColor = MessageDispatcher.ColorFatal;
                 Console.WriteLine(e.Message);
-                Console.ForegroundColor = MessageDispatcher.ColorInfo;
             }
 
             if (releaseInfo != null && releaseInfo.TrackInfos.Count() > 0)
@@ -898,6 +617,8 @@ namespace UltimateMp3TaggerShell
                         {
                             umTagger.TagFile(filename, input, tagfields);
 
+                            Console.Write(Environment.NewLine);
+
                             success++;
                         }
                         catch (Exception)
@@ -939,24 +660,17 @@ namespace UltimateMp3TaggerShell
 
             TAG_FIELDS tagfields = TAG_FIELDS.NONE;
 
-            const ConsoleColor colorQuestion = ConsoleColor.Cyan;
-            const ConsoleColor colorAnswer = ConsoleColor.Green;
-
             // title
             while (String.IsNullOrEmpty(title))
             {
-                Console.ForegroundColor = colorQuestion;
                 Console.WriteLine("Enter title to find");
-                Console.ForegroundColor = colorAnswer;
                 title = Console.ReadLine();
             }
 
             // artist
             while (String.IsNullOrEmpty(artist))
             {
-                Console.ForegroundColor = colorQuestion;
                 Console.WriteLine("Enter artist to find");
-                Console.ForegroundColor = colorAnswer;
                 artist = Console.ReadLine();
             }
 
@@ -970,9 +684,7 @@ namespace UltimateMp3TaggerShell
                 {
                     if (String.IsNullOrEmpty(tagmode))
                     {
-                        Console.ForegroundColor = colorQuestion;
                         Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL>");
-                        Console.ForegroundColor = colorAnswer;
                         tagmode = Console.ReadLine();
                     }
 
@@ -999,12 +711,10 @@ namespace UltimateMp3TaggerShell
             try
             {
                 trackInfo = lastfmUtility.GetTrack(title, artist);
-            }            
+            }
             catch (Exception e)
             {
-                Console.ForegroundColor = MessageDispatcher.ColorFatal;                
                 Console.WriteLine(e.Message);
-                Console.ForegroundColor = MessageDispatcher.ColorInfo;
             }
 
             if (trackInfo != null)
@@ -1039,14 +749,11 @@ namespace UltimateMp3TaggerShell
 
         public void ReadTagFromSingleFile(string[] args, string file)
         {
-            Console.ForegroundColor = MessageDispatcher.ColorInfo;
             ReadTag(file);
         }
 
         public void ReadTagFromMultipleFile(string[] args, string input)
         {
-            Console.ForegroundColor = MessageDispatcher.ColorInfo;
-            
             string path = Path.GetDirectoryName(input);
             string fileextension = Path.GetFileName(input);
 
@@ -1133,18 +840,16 @@ namespace UltimateMp3TaggerShell
             };
 
             p.Parse(args);
-
+            
             while (validModes.Contains(mode) == false)
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter a valid mode <manual|lastfm>");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 mode = Console.ReadLine();
             }
 
             bool useLastfm = mode.Equals(ModeLastfm);
 
-            if (isHelpRequested == false)
+            if (!isHelpRequested)
             {
                 if (useLastfm)
                     TagFileLastfm(file, title, trackArtists, tagmode);
@@ -1175,8 +880,6 @@ namespace UltimateMp3TaggerShell
                                 v => tagmode = v },                                                               
                             { "artist=", "artist name",
                                 v => albumArtists = v },                            
-                            { "album=", "album name",
-                                v => album = v },   
                             { "title=", "track title",
                                 v => title = v },   
                         };
@@ -1188,15 +891,17 @@ namespace UltimateMp3TaggerShell
                     opt = new OptionSet() {                            
                         { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
                           v => tagmode = v },                                            
-                        { "artist=", "artist name",
+                        { "rartist=", "album artist name",
                           v => albumArtists = v },
+                        { "tartist=", "track artist name",
+                          v => trackArtists = v },
                         { "title=", "track title",
                           v => title = v },
                         { "album=", "album name",
                           v => album = v },   
                         { "year=", "release year",
                           v => year = v },
-                        { "pos=", "track position",
+                        { "position=", "track position",
                           v => trackpos = v },
                         { "image=", "image path",
                           v => imagepath = v },
@@ -1230,9 +935,7 @@ namespace UltimateMp3TaggerShell
                 { "mode=", "manual / lastfm <manual|lastfm>",
                     v => mode = v },
                 { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
-                    v => tagmode = v },                       
-                //{ "ext=", "file extension (folder mode only)",
-                //    v => fileextension = v },             
+                    v => tagmode = v },                     
                 { "rartist=", "album artist name",
                     v => albumArtists = v },
                 { "tartist=", "track artist name",
@@ -1247,7 +950,7 @@ namespace UltimateMp3TaggerShell
                     v => imagepath = v },
                 { "genres=", "genres, embraced and comma separated (ex. \"rock, hard rock\")",
                     v => genres = v }, 
-                { "match=", "track / filename match mode <p|f>",
+                { "match=", "track / filename match mode <p|n>",
                     v => match = v.ToCharArray()[0] }, 
             };
 
@@ -1255,9 +958,7 @@ namespace UltimateMp3TaggerShell
             
             while (validModes.Contains(mode) == false)
             {
-                Console.ForegroundColor = MessageDispatcher.ColorQuestion;
                 Console.WriteLine("Enter a valid mode <manual|lastfm>");
-                Console.ForegroundColor = MessageDispatcher.ColorAnswer;
                 mode = Console.ReadLine();                
             }
 
@@ -1266,15 +967,11 @@ namespace UltimateMp3TaggerShell
             string path = Path.GetDirectoryName(input);
             fileextension = Path.GetFileName(input);
 
-            Console.ResetColor();
-
-            if (isHelpRequested == false)
+            if (!isHelpRequested)
             {
                 if (String.IsNullOrEmpty(fileextension))
                 {
-                    Console.ForegroundColor = MessageDispatcher.ColorQuestion;
-                    Console.WriteLine("Enter an audio file extension to process in path (default mp3)");
-                    Console.ForegroundColor = MessageDispatcher.ColorAnswer;
+                    Console.WriteLine("Enter an audio file extension to process in path (default .mp3)");
                     fileextension = Console.ReadLine();
                     if (String.IsNullOrEmpty(fileextension))
                     {
@@ -1282,16 +979,12 @@ namespace UltimateMp3TaggerShell
                     }
                 }
 
-                Console.ForegroundColor = MessageDispatcher.ColorInfo;
-
                 Console.WriteLine(String.Format("extension selected: {0}", UMTShellUtility.NormalizeFilterPath(fileextension)));
 
                 string[] files = UMTShellUtility.GetFilesFromPath(path, fileextension, SearchOption.TopDirectoryOnly);
 
                 Console.WriteLine(String.Format("{0} files found in path", files.Count()));
 
-                Console.ResetColor();
-                
                 if (useLastfm)
                     TagPathLastfm(files, album, albumArtists, tagmode, match);
                 else
@@ -1300,9 +993,6 @@ namespace UltimateMp3TaggerShell
             }
             else
             {
-
-                Console.ForegroundColor = MessageDispatcher.ColorInfo;
-
                 Console.WriteLine(Environment.NewLine);
 
                 OptionSet opt = null;
@@ -1314,17 +1004,11 @@ namespace UltimateMp3TaggerShell
                     opt = new OptionSet() {                            
                             { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
                                 v => tagmode = v },                                   
-                            //{ "ext=", "file extension (default mp3)",
-                            //    v => fileextension = v },             
-                            { "rartist=", "album artist name",
-                                v => albumArtists = v },                            
-                            { "tartist=", "track artist name",
-                                v => trackArtists = v },                            
                             { "artist=", "album/track artist name",
                                 v => trackArtists = albumArtists = v },                            
                             { "album=", "album name",
                                 v => album = v },   
-                            { "match=", "track / filename match mode <p|f>",
+                            { "match=", "track / filename match mode <p|n>",
                                 v => match = v.ToCharArray()[0] },                        
                         };
                 }
@@ -1335,14 +1019,10 @@ namespace UltimateMp3TaggerShell
                     opt = new OptionSet() {                            
                         { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
                           v => tagmode = v },                    
-                        //{ "ext=", "file extension (default mp3)",
-                        //  v => fileextension = v },                    
                         { "rartist=", "album artist name",
                                 v => albumArtists = v },                            
                         { "tartist=", "track artist name",
                             v => trackArtists = v },                            
-                        { "artist=", "album/track artist name",
-                            v => trackArtists = albumArtists = v },         
                         { "album=", "album name",
                           v => album = v },   
                         { "year=", "release year",
