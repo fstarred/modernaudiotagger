@@ -3,6 +3,10 @@
 # Modern Audio Tagger
 Modern Audio Tagger is a powerful, easy and extreme fast tool to reorganize your music library
 
+| ![ui image](docs/assets/ui.jpg?raw=true "Modern Audio Tagger UI Screenshot") | ![cli image](docs/assets/cli.jpg?raw=true "Ultimate Music Tagger CLI Screenshot") |
+| ----------------------------------- | -------------------------------------- |
+| *Modern Audio Tagger UI Screenshot* | *Ultimate Music Tagger CLI Screenshot* |
+
 ### Wiki
 Read the [Guide](https://github.com/fstarred/modernaudiotagger/wiki/Modern-Audio-Tagger-Home) for more information about the usage
 
