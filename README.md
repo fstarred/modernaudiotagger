@@ -4,7 +4,7 @@
 Modern Audio Tagger is a powerful, easy and extreme fast tool to reorganize your music library
 
 ### Wiki
-Read the [Guide](https://github.com/fstarred/modernaudiotagger/wiki/Modern-Audio-Tagger-UI-Wiki) for more information about the usage
+Read the [Guide](https://github.com/fstarred/modernaudiotagger/wiki/Modern-Audio-Tagger-Home) for more information about the usage
 
 ### Donation
 Modern Audio Tagger is a freeware project that is developed in personal time. You can show your appreciation for this project and support future development by donating.
