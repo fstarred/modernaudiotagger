@@ -5,12 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Xml;
-using UltimateMusicTagger;
-using UltimateMusicTagger.Business;
-using UltimateMusicTagger.Model;
 using static UltimateMp3TaggerShell.UMTShellUtility;
 
 namespace UltimateMp3TaggerShell
@@ -86,7 +81,7 @@ namespace UltimateMp3TaggerShell
 
                 List<string> extra = p.Parse(args);
 
-                if (!isHelpRequired && extra.Count > 1)
+                if (extra.Count > 1)
                 {
                     action = extra.FirstOrDefault();
                     input = extra.Count() > 1 ? extra[1] : null;
@@ -189,7 +184,7 @@ namespace UltimateMp3TaggerShell
                                 renameAction = umtTaggerRenamer.RenameFilesInPath;
                                 break;
                             case PATTERN_TYPE.DIRECTORY:
-                                renameAction = umtTaggerRenamer.RenameFolder;
+                                renameAction = umtTaggerRenamer.RenameDirectory;
                                 break;
                             default:
                                 renameAction = null;
@@ -252,7 +247,7 @@ namespace UltimateMp3TaggerShell
                 Thread.Sleep(300); // this is bad trick to dequeque last messages
             }
 
-            Console.Read();
+            //Console.Read();
         }
 
         /// <summary>
@@ -261,8 +256,11 @@ namespace UltimateMp3TaggerShell
         /// <param name="p"></param>
         private static void PrintGeneralUsage(string program, OptionSet p)
         {
-            Console.WriteLine("Ultimate Music Tagger usage:\n");
-            Console.WriteLine(String.Format("{0} <tag|read|rename> <path> [options]", program));
+            Console.WriteLine("Ultimate Music Tagger information");            
+            Console.WriteLine(String.Format("Version: {0}", UMTShellUtility.GetFileVersion(System.Reflection.Assembly.GetExecutingAssembly()).FileVersion));
+            Console.WriteLine("Usage:");
+            Console.Write(Environment.NewLine);
+            Console.WriteLine(String.Format("{0} <tag|read|rename> <path> [options]", program));            
 
             p.WriteOptionDescriptions(Console.Out);            
         }
@@ -278,7 +276,7 @@ namespace UltimateMp3TaggerShell
 
             //try
             //{
-            IConfigSource configSource = new IniConfigSource("umtagger.ini");
+            IConfigSource configSource = new IniConfigSource(Path.Combine(UMTShellUtility.GetPathFromAssembly(System.Reflection.Assembly.GetExecutingAssembly()), "umtagger.ini"));
 
             IConfig configSection = configSource.Configs["Proxy"];
 

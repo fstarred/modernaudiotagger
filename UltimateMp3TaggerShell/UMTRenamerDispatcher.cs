@@ -91,7 +91,7 @@ namespace UltimateMp3TaggerShell
 
             p.Parse(args);
 
-            if (showHelp == false)
+            if (!showHelp)
             {
                 string fieldRequired = String.Empty;
 
@@ -131,7 +131,7 @@ namespace UltimateMp3TaggerShell
             }
         }
 
-        public void RenameFolder(string[] args, string input)
+        public void RenameDirectory(string[] args, string input)
         {
             bool isHelpRequested = false;
             string pattern = null;
@@ -148,7 +148,7 @@ namespace UltimateMp3TaggerShell
 
             p.Parse(args);
 
-            if (isHelpRequested == false)
+            if (!isHelpRequested)
             {
                 bool isPatternEmpty = String.IsNullOrEmpty(pattern);
 
@@ -224,7 +224,6 @@ namespace UltimateMp3TaggerShell
                 p.WriteOptionDescriptions(Console.Out);
 
                 ShowPatternUsage(PATTERN_TYPE.FOLDER);
-
             }
         }
 
@@ -232,24 +231,17 @@ namespace UltimateMp3TaggerShell
         {
             bool isHelpRequested = false;
             string pattern = null;
-            string refFile = null;
-
+            
             var p = new OptionSet() {
                 { "h|help", "help for this mode",
                     v => isHelpRequested = true },
                 { "p|pattern=", "pattern for rename ",
-                    v => pattern = v }, 
-                //{ "t|target=", "file / folder <file|folder> (mode folder only, default file)" ,
-                //    v => target = v }, 
-                { "ref=", "tag file reference" ,
-                    v => refFile = v },               
-                //{ "ext=", "file extension (mode folder only)",
-                //    v => fileextension = v },            
+                    v => pattern = v },                               
             };
 
             p.Parse(args);
 
-            if (isHelpRequested == false)
+            if (!isHelpRequested)
             {
                 //bool isTargetValid = new string[] { TargetFile, TargetFolder }.Contains(target);
 
@@ -291,8 +283,7 @@ namespace UltimateMp3TaggerShell
             {
                 p.WriteOptionDescriptions(Console.Out);
 
-                ShowPatternUsage(PATTERN_TYPE.FILE);
-
+                ShowPatternUsage(PATTERN_TYPE.FILE);            
             }
 
         }
