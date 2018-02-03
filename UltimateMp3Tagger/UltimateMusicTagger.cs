@@ -545,7 +545,7 @@ namespace UltimateMusicTagger
                     string filenameOld = Path.GetFileNameWithoutExtension(file);
                     string path = Path.GetDirectoryName(file);
                     string ext = Path.GetExtension(file);
-                    string filePathNew = String.Format("{0}\\{1}{2}", path, filenameNew, ext);
+                    string filePathNew = String.Format("{0}{1}", Path.Combine( path, filenameNew), ext);
 
                     try
                     {
