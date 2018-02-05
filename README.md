@@ -10,7 +10,7 @@ The CLI version can run under Windows, Linux or OsX OS with [mono](http://www.mo
 | *Modern Audio Tagger UI Screenshot* | *Ultimate Music Tagger CLI Screenshot* |
 
 ### Wiki
-Read the [Guide](https://github.com/fstarred/modernaudiotagger/wiki/Modern-Audio-Tagger-Home) for more information about the usage
+Read the [Guide](https://github.com/fstarred/modernaudiotagger/wiki/Home) for more information about the usage
 
 ### Donation
 Modern Audio Tagger is a freeware project that is developed in personal time. You can show your appreciation for this project and support future development by donating.
