@@ -1,7 +1,9 @@
 <div data-type="ad" data-publisher="fstarred.github.io" data-format="728x90" data-zone="modernaudiotagger" data-tags="tag%20music%2crename%20music%2cread%20tag%2cmp3%20tag%2cscript%20mp3%20tag%2cscript%20mp3%20music%2cauto%20tag%20music"></div> 
 
 # Modern Audio Tagger
-Modern Audio Tagger is a powerful, easy and extreme fast tool to reorganize your music library
+Modern Audio Tagger is a powerful, easy and extreme fast tool to reorganize your music library.
+
+The CLI version can run under Windows, Linux or OsX OS with [mono](http://www.mono-project.com/download/).
 
 | ![ui image](docs/assets/ui.jpg?raw=true "Modern Audio Tagger UI Screenshot") | ![cli image](docs/assets/cli.jpg?raw=true "Ultimate Music Tagger CLI Screenshot") |
 | ----------------------------------- | -------------------------------------- |
