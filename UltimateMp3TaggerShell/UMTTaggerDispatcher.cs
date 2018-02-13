@@ -37,13 +37,17 @@ namespace UltimateMp3TaggerShell
 
         const string ModeManual = "manual";
         const string ModeLastfm = "lastfm";
+        const string ModeMBrainz = "mbrainz";
 
-        readonly static string[] validModes = new string[] { ModeLastfm, ModeManual };
+        const int MBID_LENGTH = 36;
+
+        readonly static string[] validModes = new string[] { ModeLastfm, ModeManual, ModeMBrainz };
 
         bool isTaggerProcessEnd = false;
 
         UltiMp3Tagger umTagger;
         LastfmUtility lastfmUtility;
+        MusicBrainzUtility musicBrainzUtility;
 
         WebProxy proxy;
 
@@ -51,6 +55,7 @@ namespace UltimateMp3TaggerShell
         {
             umTagger = new UltiMp3Tagger(proxy);
             lastfmUtility = new LastfmUtility(null, proxy);
+            musicBrainzUtility = new MusicBrainzUtility(proxy);
             this.proxy = proxy;
         }
 
@@ -648,6 +653,104 @@ namespace UltimateMp3TaggerShell
 
         }
 
+        private void TagFileMusicBrainzId(string file, string recordingMBID, string releaseMBID, string tagmode)
+        {
+            TAG_FIELDS tagfields = TAG_FIELDS.NONE;
+
+            // recording mbid
+            while (String.IsNullOrEmpty(recordingMBID) || recordingMBID.Length != MBID_LENGTH)
+            {
+                Console.WriteLine("Enter a valid recording MBID to find");
+                recordingMBID = Console.ReadLine();
+            }
+
+            if (String.IsNullOrEmpty(releaseMBID))
+                releaseMBID = "---";
+
+            // release mbid
+            while (!String.IsNullOrEmpty(releaseMBID) && releaseMBID.Length != MBID_LENGTH)
+            {
+                Console.WriteLine("Enter a valid release MBID associated to recording (leave empty to take the first one)");
+                releaseMBID = Console.ReadLine();
+            }
+
+            // tagmode            
+            bool isValidTagMode = false;
+
+            do
+            {
+                try
+                {
+                    if (String.IsNullOrEmpty(tagmode))
+                    {
+                        Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL>");
+                        tagmode = Console.ReadLine();
+                    }
+
+                    tagfields = ParseTagMode(tagmode);
+
+                    isValidTagMode = String.IsNullOrEmpty(tagmode) == false;
+
+                }
+                catch (ApplicationException)
+                {
+                    tagmode = String.Empty;
+                }
+
+            }
+            while (isValidTagMode == false);
+
+            MessageDispatcher.PrintTagMode(tagfields);
+
+            TrackInfo trackInfo = null;
+
+            try
+            {
+                trackInfo = musicBrainzUtility.GetRecording(recordingMBID);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            if (trackInfo != null)
+            {
+                //ReleaseInfo releaseInfo = trackInfo.Releases.Length > 0 ? trackInfo.Releases[0] : new ReleaseInfo();
+                ReleaseInfo releaseInfo = trackInfo.
+                    Releases.
+                    FirstOrDefault(i => i.Mbid.Equals(releaseMBID))
+                    ?? (
+                        (trackInfo.Releases.Length > 0) ?
+                        trackInfo.Releases[0] :
+                        new ReleaseInfo()
+                    );
+
+                Image picture = MTUtility.ImageFromUri(releaseInfo.ImagePath, proxy);
+
+                ModelTag input = new ModelTag
+                {
+                    Title = trackInfo.Title,
+                    Album = releaseInfo.Title,
+                    AlbumArtists = releaseInfo.Artists != null ? releaseInfo.Artists.Select(a => a.Name).ToArray() : null,
+                    Genres = null,
+                    ArtistMbid = trackInfo.Artists != null ? trackInfo.Artists[0].Mbid : null,
+                    Picture = picture,
+                    ReleaseMbid = releaseInfo.Mbid,
+                    TrackMbid = trackInfo.Mbid,
+                    Position = trackInfo.Track,
+                    Year = GetYearFromDate(releaseInfo.Year),
+                    TrackArtists = trackInfo.Artists != null ? trackInfo.Artists.Select(a => a.Name).ToArray() : null,
+                };
+
+                umTagger.TagFile(file, input, tagfields);
+            }
+
+            UMTMessage[] messages = umTagger.UnqueueMessages();
+
+            MessageDispatcher.PrintMessages(messages);
+
+        }
+
         /// <summary>
         /// TagFileLastfm
         /// </summary>
@@ -815,7 +918,7 @@ namespace UltimateMp3TaggerShell
             var p = new OptionSet() {           
                 { "h|help", "help for this mode",
                     v => isHelpRequested = true },                                             
-                { "mode=", "manual / lastfm <manual|lastfm>",
+                { "mode=", "<manual|lastfm|mbrainz>",
                     v => mode = v },
                 { "fields=", "fields to tag (a t T r R y p i g m)",
                     v => tagmode = v },                                       
@@ -841,77 +944,102 @@ namespace UltimateMp3TaggerShell
 
             p.Parse(args);
             
-            while (validModes.Contains(mode) == false)
+            while (!validModes.Contains(mode))
             {
-                Console.WriteLine("Enter a valid mode <manual|lastfm>");
+                Console.WriteLine("Enter a valid mode <manual|lastfm|mbrainz>");
                 mode = Console.ReadLine();
             }
-
-            bool useLastfm = mode.Equals(ModeLastfm);
-
+            
             if (!isHelpRequested)
             {
-                if (useLastfm)
-                    TagFileLastfm(file, title, trackArtists, tagmode);
-                else                    
-                    TagFileManually(file, tagmode,
-                        album,
-                        albumArtists,
-                        trackArtists,
-                        title,
-                        genres,                        
-                        year,   
-                        trackpos,
-                        imagepath
-                     );
-            }
+                switch (mode)
+                {
+                    case ModeLastfm:
+                        TagFileLastfm(file, title, trackArtists, tagmode);
+                        break;
+                    case ModeMBrainz:
+                        TagFileMusicBrainzId(file, title, album, tagmode);
+                        break;
+                    default:
+                        TagFileManually(file, tagmode,
+                            album,
+                            albumArtists,
+                            trackArtists,
+                            title,
+                            genres,
+                            year,
+                            trackpos,
+                            imagepath
+                         );
+                        break;
+                }
+            }            
             else
             {
                 Console.WriteLine(Environment.NewLine);
 
                 OptionSet opt = null;
 
-                if (useLastfm)
-                {
-                    Console.WriteLine("options for lastfm mode:");
+                string message;
 
-                    opt = new OptionSet() {                            
+                switch (mode)
+                {
+                    case ModeLastfm:
+
+                        message = "options for lastfm mode:";
+
+                        opt = new OptionSet() {
                             { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
-                                v => tagmode = v },                                                               
+                                v => tagmode = v },
                             { "artist=", "artist name",
-                                v => albumArtists = v },                            
+                                v => albumArtists = v },
                             { "title=", "track title",
-                                v => title = v },   
+                                v => title = v },
                         };
-                }
-                else
-                {
-                    Console.WriteLine("options for manual mode:");
+                        break;
+                    case ModeMBrainz:
 
-                    opt = new OptionSet() {                            
-                        { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
-                          v => tagmode = v },                                            
-                        { "rartist=", "album artist name",
-                          v => albumArtists = v },
-                        { "tartist=", "track artist name",
-                          v => trackArtists = v },
-                        { "title=", "track title",
-                          v => title = v },
-                        { "album=", "album name",
-                          v => album = v },   
-                        { "year=", "release year",
-                          v => year = v },
-                        { "position=", "track position",
-                          v => trackpos = v },
-                        { "image=", "image path",
-                          v => imagepath = v },
-                        { "genres=", "genres, embraced and comma separated (ex. \"rock, hard rock\")",
-                          v => genres = v },  
+                        message = "options for music brainz id mode:";
+
+                        opt = new OptionSet() {
+                            { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
+                                v => tagmode = v },
+                            { "album=", "release MBID",
+                                v => albumArtists = v },
+                            { "title=", "recording MBID",
+                                v => title = v },
                         };
+                        break;
+                    default:
+
+                        message = "options for manual mode:";
+
+                        opt = new OptionSet() {
+                            { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
+                              v => tagmode = v },
+                            { "rartist=", "album artist name",
+                              v => albumArtists = v },
+                            { "tartist=", "track artist name",
+                              v => trackArtists = v },
+                            { "title=", "track title",
+                              v => title = v },
+                            { "album=", "album name",
+                              v => album = v },
+                            { "year=", "release year",
+                              v => year = v },
+                            { "position=", "track position",
+                              v => trackpos = v },
+                            { "image=", "image path",
+                              v => imagepath = v },
+                            { "genres=", "genres, embraced and comma separated (ex. \"rock, hard rock\")",
+                              v => genres = v },
+                        };
+                        break;
                 }
+
+                Console.WriteLine(message);
 
                 opt.WriteOptionDescriptions(Console.Out);
-
             }
         }
 
