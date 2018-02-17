@@ -459,28 +459,112 @@ namespace UltimateMp3TaggerShell
             MessageDispatcher.PrintMessages(messages);
 
         }
-        
 
 
-
-        private void TagPathLastfm(string[] files, string album, string artist, string tagmode, char seekmode)
+        private void TagPathMusicBrainzIdWithMbid(string[] files, string releaseMBID, string tagmode, char seekmode)
         {
+            // release mbid
+            while (String.IsNullOrEmpty(releaseMBID) || releaseMBID.Length != MBID_LENGTH)
+            {
+                Console.WriteLine("Enter a valid release MBID");
+                releaseMBID = Console.ReadLine();
+            }
+
+            // tag fields
+            TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
+
+            // filename match mode
+            FILENAME_MATCH filenameMatchMode = ReadFilenameMatchModeIn(seekmode);
             
+            ReleaseInfo releaseInfo = null;
+
+            try
+            {
+                releaseInfo = musicBrainzUtility.GetRelease(releaseMBID);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            if (releaseInfo != null)
+            {
+                MessageDispatcher.PrintTagMode(tagfields);
+
+                MessageDispatcher.PrintTrackMatch(filenameMatchMode);
+
+                Task.Factory.StartNew(PrintMessages);
+
+                List<TrackInfo> list = releaseInfo.TrackInfos.ToList();
+
+                Func<string, List<TrackInfo>, TrackInfo> comparer = null;
+
+                switch (filenameMatchMode)
+                {
+                    case FILENAME_MATCH.LEVENSHTEIN_DISTANCE:
+                        comparer = MTUtility.GetTrackInfoByLevenshteinDistance;
+                        break;
+                    case FILENAME_MATCH.TRACK_POSITION:
+                        comparer = MTUtility.GetTrackInfoByPosition;
+                        break;
+                }
+
+                int success = 0;
+                int failure = 0;
+                int skipped = 0;
+
+                foreach (string filename in files)
+                {
+                    string filenameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+
+                    TrackInfo trackInfo = comparer(filenameWithoutExtension, list);
+
+                    if (trackInfo != null)
+                    {
+                        ModelTag input = new ModelTag
+                        {
+                            Title = trackInfo.Title,
+                            Album = releaseInfo.Title,
+                            AlbumArtists = releaseInfo.Artists != null ? releaseInfo.Artists.Select(a => a.Name).ToArray() : null,
+                            Genres = null,
+                            ArtistMbid = trackInfo.Artists != null ? trackInfo.Artists[0].Mbid : null,
+                            Picture = MTUtility.ImageFromUri(releaseInfo.ImagePath, proxy),
+                            ReleaseMbid = releaseInfo.Mbid,
+                            TrackMbid = trackInfo.Mbid,
+                            Position = trackInfo.Track,
+                            Year = GetYearFromDate(releaseInfo.Year),
+                            TrackArtists = trackInfo.Artists != null ? trackInfo.Artists.Select(a => a.Name).ToArray() : null,
+                        };
+
+                        try
+                        {
+                            umTagger.TagFile(filename, input, tagfields);
+
+                            Console.Write(Environment.NewLine);
+
+                            success++;
+                        }
+                        catch (Exception)
+                        {
+                            failure++;
+                        }
+                    }
+                    else
+                        skipped++;
+                }
+
+                isTaggerProcessEnd = true;
+            }
+            else
+            {
+                Console.WriteLine(String.Format("No release found for mbid: {0}", releaseMBID));
+            }
+        }
+
+
+        FILENAME_MATCH ReadFilenameMatchModeIn(char seekmode)
+        {
             FILENAME_MATCH match = FILENAME_MATCH.LEVENSHTEIN_DISTANCE;
-
-            // album
-            while (String.IsNullOrEmpty(album))
-            {
-                Console.WriteLine("Enter album to find");
-                album = Console.ReadLine();
-            }
-
-            // artist
-            while (String.IsNullOrEmpty(artist))
-            {
-                Console.WriteLine("Enter artist to find");
-                artist = Console.ReadLine();
-            }
 
             // track/filename match algo
             bool isValidTrackMatch = false;
@@ -490,7 +574,7 @@ namespace UltimateMp3TaggerShell
                 string trackmatch = String.Empty;
                 if (seekmode == ' ')
                 {
-                    Console.WriteLine("Enter track/filename match algo <p|n>");
+                    Console.WriteLine("Enter valid filename tagging criteria (position or title) <p|n>");
                     trackmatch = Console.ReadLine();
                 }
 
@@ -507,7 +591,32 @@ namespace UltimateMp3TaggerShell
                 {
                     seekmode = ' ';
                 }
-            } while (isValidTrackMatch == false);
+            } while (!isValidTrackMatch);
+
+            return match;
+        }
+
+
+
+        private void TagPathLastfm(string[] files, string album, string artist, string tagmode, char seekmode)
+        {
+            
+            // album
+            while (String.IsNullOrEmpty(album))
+            {
+                Console.WriteLine("Enter album to find");
+                album = Console.ReadLine();
+            }
+
+            // artist
+            while (String.IsNullOrEmpty(artist))
+            {
+                Console.WriteLine("Enter artist to find");
+                artist = Console.ReadLine();
+            }
+
+            // filename match mode
+            FILENAME_MATCH filenameMatchMode = ReadFilenameMatchModeIn(seekmode);
 
             // tag fields
             TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
@@ -517,7 +626,7 @@ namespace UltimateMp3TaggerShell
 
             MessageDispatcher.PrintTagMode(tagfields);
 
-            MessageDispatcher.PrintTrackMatch(match);
+            MessageDispatcher.PrintTrackMatch(filenameMatchMode);
 
             Task.Factory.StartNew(PrintMessages);
 
@@ -538,7 +647,7 @@ namespace UltimateMp3TaggerShell
 
                 Func<string, List<TrackInfo>, TrackInfo> comparer = null;
 
-                switch (match)
+                switch (filenameMatchMode)
                 {
                     case FILENAME_MATCH.LEVENSHTEIN_DISTANCE:
                         comparer = MTUtility.GetTrackInfoByLevenshteinDistance;
@@ -1186,19 +1295,21 @@ namespace UltimateMp3TaggerShell
             bool isHelpRequested = false;
             string tagmode = null;
             string mode = null;
+            string mbrainzMode = null;
             string fileextension = null;
             string albumArtists = null;
             string trackArtists = null;
             string album = null;
             string year = null;
             string imagepath = null;
+            string releaseMBID = null;
             char match = ' ';
             string genres = null;
 
             var p = new OptionSet() {           
                 { "h|help", "help for this mode",
                     v => isHelpRequested = true },                          
-                { "mode=", "manual / lastfm <manual|lastfm>",
+                { "mode=", "manual / lastfm / musicbrainz <manual|lastfm|mbrainz>",
                     v => mode = v },
                 { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
                     v => tagmode = v },                     
@@ -1209,7 +1320,9 @@ namespace UltimateMp3TaggerShell
                 { "artist=", "album/track artist name",
                     v => albumArtists = trackArtists = v },
                 { "album=", "album name",
-                    v => album = v },   
+                    v => album = v },
+                { "releaseMBID=", "release Music Brainz ID",
+                    v => releaseMBID = v},
                 { "year=", "release year",
                     v => year = v },
                 { "image=", "image path",
@@ -1224,12 +1337,10 @@ namespace UltimateMp3TaggerShell
             
             while (validModes.Contains(mode) == false)
             {
-                Console.WriteLine("Enter a valid mode <manual|lastfm>");
+                Console.WriteLine("Enter a valid mode <manual|lastfm|mbrainz>");
                 mode = Console.ReadLine();                
             }
-
-            bool useLastfm = mode.Equals(ModeLastfm);
-
+            
             string path = Path.GetDirectoryName(input);
             fileextension = Path.GetFileName(input);
 
@@ -1251,11 +1362,30 @@ namespace UltimateMp3TaggerShell
 
                 Console.WriteLine(String.Format("{0} files found in path", files.Count()));
 
-                if (useLastfm)
-                    TagPathLastfm(files, album, albumArtists, tagmode, match);
-                else
-                    TagPathManually(files, tagmode, album, albumArtists, trackArtists, genres, year, imagepath);
+                if (mode.Equals(ModeMBrainz))
+                {
+                    while (!validMusicBrainzModes.Contains(mbrainzMode))
+                    {
+                        Console.WriteLine("Enter a valid lookup method <mbid|title>");
+                        mbrainzMode = Console.ReadLine();
+                    }
+                }
 
+                switch (mode)
+                {
+                    case ModeLastfm:
+                        TagPathLastfm(files, album, albumArtists, tagmode, match);
+                        break;
+                    case ModeMBrainz:
+                        if (mbrainzMode.Equals(ModeResourceMbid))
+                            TagPathMusicBrainzIdWithMbid(files, releaseMBID, tagmode, match);
+
+                        break;
+                    case ModeManual:
+                        TagPathManually(files, tagmode, album, albumArtists, trackArtists, genres, year, imagepath);
+                        break;
+                }
+    
             }
             else
             {
@@ -1263,42 +1393,51 @@ namespace UltimateMp3TaggerShell
 
                 OptionSet opt = null;
 
-                if (useLastfm)
+                string message;
+
+                switch (mode)
                 {
-                    Console.WriteLine("options for lastfm mode:");
-
-                    opt = new OptionSet() {                            
+                    case ModeLastfm:
+                        message = "options for lastfm mode";
+                        opt = new OptionSet() {
+                                { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
+                                    v => tagmode = v },
+                                { "artist=", "album/track artist name",
+                                    v => trackArtists = albumArtists = v },
+                                { "album=", "album name",
+                                    v => album = v },
+                                { "match=", "track / filename match mode <p|n>",
+                                    v => match = v.ToCharArray()[0] },
+                            };
+                        break;
+                    case ModeMBrainz:
+                        message = "options for mbrainz mode";
+                        break;
+                    case ModeManual:
+                        message = "options for manual mode";
+                        opt = new OptionSet() {
                             { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
-                                v => tagmode = v },                                   
-                            { "artist=", "album/track artist name",
-                                v => trackArtists = albumArtists = v },                            
+                              v => tagmode = v },
+                            { "rartist=", "album artist name",
+                                    v => albumArtists = v },
+                            { "tartist=", "track artist name",
+                                v => trackArtists = v },
                             { "album=", "album name",
-                                v => album = v },   
-                            { "match=", "track / filename match mode <p|n>",
-                                v => match = v.ToCharArray()[0] },                        
-                        };
+                              v => album = v },
+                            { "year=", "release year",
+                              v => year = v },
+                            { "image=", "image path",
+                              v => imagepath = v },
+                            { "genres=", "genres, embraced and comma separated (ex. \"rock, hard rock\")",
+                              v => genres = v  },
+                            };
+                        break;
+                    default:
+                        message = null;
+                        break;
                 }
-                else
-                {                    
-                    Console.WriteLine("options for manual mode:");
 
-                    opt = new OptionSet() {                            
-                        { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
-                          v => tagmode = v },                    
-                        { "rartist=", "album artist name",
-                                v => albumArtists = v },                            
-                        { "tartist=", "track artist name",
-                            v => trackArtists = v },                            
-                        { "album=", "album name",
-                          v => album = v },   
-                        { "year=", "release year",
-                          v => year = v },                        
-                        { "image=", "image path",
-                          v => imagepath = v },
-                        { "genres=", "genres, embraced and comma separated (ex. \"rock, hard rock\")",
-                          v => genres = v  },  
-                        };
-                }
+                Console.WriteLine(message);
 
                 opt.WriteOptionDescriptions(Console.Out);
 
