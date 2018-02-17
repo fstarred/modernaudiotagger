@@ -39,9 +39,13 @@ namespace UltimateMp3TaggerShell
         const string ModeLastfm = "lastfm";
         const string ModeMBrainz = "mbrainz";
 
+        const string ModeResourceMbid = "mbid";
+        const string ModeResourceTitle = "title";
+
         const int MBID_LENGTH = 36;
 
         readonly static string[] validModes = new string[] { ModeLastfm, ModeManual, ModeMBrainz };
+        readonly static string[] validMusicBrainzModes = new string[] { ModeResourceMbid, ModeResourceTitle };
 
         bool isTaggerProcessEnd = false;
 
@@ -336,37 +340,12 @@ namespace UltimateMp3TaggerShell
             string position,
             string imagepath)
         {
-            TAG_FIELDS tagfields = TAG_FIELDS.NONE;
-
             Image picture = null;
             uint nposition = 0;
             uint nyear = 0;
 
-            // tagmode            
-            bool isValidTagMode = false;
-
-            do
-            {
-                try
-                {
-                    if (String.IsNullOrEmpty(tagmode))
-                    {
-                        Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL>");
-                        tagmode = Console.ReadLine();
-                    }
-
-                    tagfields = ParseTagMode(tagmode);
-
-                    isValidTagMode = String.IsNullOrEmpty(tagmode) == false;
-
-                }
-                catch (ApplicationException)
-                {
-                    tagmode = String.Empty;
-                }
-
-            }
-            while (isValidTagMode == false);
+            // tag fields
+            TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
 
             // title
             if (((tagfields & TAG_FIELDS.TITLE) != TAG_FIELDS.NONE) && String.IsNullOrEmpty(title))
@@ -481,10 +460,12 @@ namespace UltimateMp3TaggerShell
 
         }
         
+
+
+
         private void TagPathLastfm(string[] files, string album, string artist, string tagmode, char seekmode)
         {
-            TAG_FIELDS tagfields = TAG_FIELDS.NONE;
-
+            
             FILENAME_MATCH match = FILENAME_MATCH.LEVENSHTEIN_DISTANCE;
 
             // album
@@ -528,32 +509,8 @@ namespace UltimateMp3TaggerShell
                 }
             } while (isValidTrackMatch == false);
 
-
-            // tagmode            
-            bool isValidTagMode = false;
-
-            do
-            {
-                try
-                {
-                    if (String.IsNullOrEmpty(tagmode))
-                    {
-                        Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL>");
-                        tagmode = Console.ReadLine();
-                    }
-
-                    tagfields = ParseTagMode(tagmode);
-
-                    isValidTagMode = String.IsNullOrEmpty(tagmode) == false;
-
-                }
-                catch (ApplicationException)
-                {
-                    tagmode = String.Empty;
-                }
-
-            }
-            while (isValidTagMode == false);
+            // tag fields
+            TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
 
             // start tagging
             MessageDispatcher.PrintParameters(new ModelTag { AlbumArtists = artist.Split(','), Album = album });
@@ -653,78 +610,72 @@ namespace UltimateMp3TaggerShell
 
         }
 
-        private void TagFileMusicBrainzId(string file, string recordingMBID, string releaseMBID, string tagmode)
+        void PrintRecordingReleases(ReleaseInfo[] releases)
         {
-            TAG_FIELDS tagfields = TAG_FIELDS.NONE;
-
-            // recording mbid
-            while (String.IsNullOrEmpty(recordingMBID) || recordingMBID.Length != MBID_LENGTH)
+            Console.WriteLine("Releases associated to current recording");
+            Console.Write(Environment.NewLine);
+            int idx = 0;
+            foreach (ReleaseInfo release in releases)
             {
-                Console.WriteLine("Enter a valid recording MBID to find");
-                recordingMBID = Console.ReadLine();
+                Console.WriteLine(String.Format("{0}: {1} - {2} [{3}]", 
+                    ++idx, 
+                    release.Mbid, 
+                    release.Title, 
+                    release.Year
+                    ));
+            }
+            Console.Write(Environment.NewLine);
+        }
+
+        void PrintRecording(IEnumerable<TrackInfo> tracks)
+        {
+            Console.WriteLine("Recording list");
+            Console.Write(Environment.NewLine);
+            int idx = 0;
+            foreach (TrackInfo track in tracks)
+            {
+                Console.WriteLine(String.Format("{0}: {1} - {2} - {3} [{4}]",
+                    ++idx,
+                    track.Mbid,
+                    track.Title,
+                    track.Artists,
+                    track.Length
+                    ));
+            }
+            Console.Write(Environment.NewLine);
+        }
+
+        private void TagFileMusicBrainzIdWithTitle(string file, string title, string artist, string tagmode)
+        {
+            // recording 
+            while (String.IsNullOrEmpty(title))
+            {
+                Console.WriteLine("Enter title to find");
+                title = Console.ReadLine();
+            }
+            // artist
+            while (String.IsNullOrEmpty(artist))
+            {
+                Console.WriteLine("Enter artist to find");
+                artist = Console.ReadLine();
             }
 
-            if (String.IsNullOrEmpty(releaseMBID))
-                releaseMBID = "---";
+            // tag fields
+            TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
 
-            // release mbid
-            while (!String.IsNullOrEmpty(releaseMBID) && releaseMBID.Length != MBID_LENGTH)
+            List<TrackInfo> tracks = musicBrainzUtility.GetRecordingList(title, artist);
+
+            ReadTrackInfoIn(tracks);
+
+            if (tracks.Count() > 0)
             {
-                Console.WriteLine("Enter a valid release MBID associated to recording (leave empty to take the first one)");
-                releaseMBID = Console.ReadLine();
-            }
+                // recording
+                TrackInfo trackInfo = ReadTrackInfoIn(tracks);
 
-            // tagmode            
-            bool isValidTagMode = false;
+                // release
+                ReleaseInfo releaseInfo = ReadReleaseInfoIn(null, trackInfo.Releases);
 
-            do
-            {
-                try
-                {
-                    if (String.IsNullOrEmpty(tagmode))
-                    {
-                        Console.WriteLine("Enter fields to tag <a r R t T g y i m | ALL>");
-                        tagmode = Console.ReadLine();
-                    }
-
-                    tagfields = ParseTagMode(tagmode);
-
-                    isValidTagMode = String.IsNullOrEmpty(tagmode) == false;
-
-                }
-                catch (ApplicationException)
-                {
-                    tagmode = String.Empty;
-                }
-
-            }
-            while (isValidTagMode == false);
-
-            MessageDispatcher.PrintTagMode(tagfields);
-
-            TrackInfo trackInfo = null;
-
-            try
-            {
-                trackInfo = musicBrainzUtility.GetRecording(recordingMBID);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
-            if (trackInfo != null)
-            {
-                //ReleaseInfo releaseInfo = trackInfo.Releases.Length > 0 ? trackInfo.Releases[0] : new ReleaseInfo();
-                ReleaseInfo releaseInfo = trackInfo.
-                    Releases.
-                    FirstOrDefault(i => i.Mbid.Equals(releaseMBID))
-                    ?? (
-                        (trackInfo.Releases.Length > 0) ?
-                        trackInfo.Releases[0] :
-                        new ReleaseInfo()
-                    );
-
+                // picture
                 Image picture = MTUtility.ImageFromUri(releaseInfo.ImagePath, proxy);
 
                 ModelTag input = new ModelTag
@@ -744,40 +695,20 @@ namespace UltimateMp3TaggerShell
 
                 umTagger.TagFile(file, input, tagfields);
             }
-
+            else
+            {
+                Console.WriteLine(String.Format("No recording found for title: {0} / artist: {1}", title, artist));
+            }
+            
             UMTMessage[] messages = umTagger.UnqueueMessages();
 
             MessageDispatcher.PrintMessages(messages);
-
         }
 
-        /// <summary>
-        /// TagFileLastfm
-        /// </summary>
-        /// <param name="file"></param>
-        /// <param name="title"></param>
-        /// <param name="artist"></param>
-        /// <param name="tagmode"></param>
-        private void TagFileLastfm(string file, string title, string artist, string tagmode)
+        TAG_FIELDS ReadTagModeIn(string tagmode)
         {
-
             TAG_FIELDS tagfields = TAG_FIELDS.NONE;
 
-            // title
-            while (String.IsNullOrEmpty(title))
-            {
-                Console.WriteLine("Enter title to find");
-                title = Console.ReadLine();
-            }
-
-            // artist
-            while (String.IsNullOrEmpty(artist))
-            {
-                Console.WriteLine("Enter artist to find");
-                artist = Console.ReadLine();
-            }
-
-            
             // tagmode            
             bool isValidTagMode = false;
 
@@ -802,7 +733,193 @@ namespace UltimateMp3TaggerShell
                 }
 
             }
-            while (isValidTagMode == false);
+            while (!isValidTagMode);
+
+            return tagfields;
+        }
+
+
+
+        TrackInfo ReadTrackInfoIn(IList<TrackInfo> tracks)
+        {
+            TrackInfo trackInfo;
+
+            if (tracks.Count() > 1)
+            {
+                bool isValidChoice;
+
+                do
+                {                    
+                    PrintRecording(tracks);
+
+                    Console.WriteLine(String.Format("Enter a valid choice: [1 - {0}]:", tracks.Count()));
+                    string response = Console.ReadLine();
+                    int idx;
+                    bool isValidNumber = int.TryParse(response, out idx);
+                    isValidChoice = isValidNumber && idx > 0 && idx <= tracks.Count;
+                    trackInfo = isValidChoice ?
+                        tracks[idx - 1] :
+                        null;                    
+                }
+                while (!isValidChoice);
+            }
+            else if (tracks.Count() == 1)
+            {
+                trackInfo = tracks[0];
+            }
+            else
+            {
+                trackInfo = null;
+            }
+
+            return trackInfo;
+        }
+
+
+
+        ReleaseInfo ReadReleaseInfoIn(string releaseMBID, ReleaseInfo[] releases)
+        {
+            if (releases.Count() > 1)
+            {
+                if (!String.IsNullOrEmpty(releaseMBID))
+                {
+                    //releaseMBID = trackInfo.Releases
+                    //    .Where(i => i.Mbid.Equals(releaseMBID))
+                    //    .Select(i => i.Mbid)
+                    //    .FirstOrDefault();
+                    bool exists = 
+                        releases
+                        .Any(i => i.Mbid.Equals(releaseMBID))
+                        ;
+
+                    if (!exists)
+                        releaseMBID = null;
+                }
+
+                while (String.IsNullOrEmpty(releaseMBID))
+                {
+                    PrintRecordingReleases(releases);
+
+                    Console.WriteLine(String.Format("Enter a valid choice [1 - {0}]:", releases.Count()));
+                    string response = Console.ReadLine();
+                    int idx;
+                    bool isValidNumber = int.TryParse(response, out idx);
+                    if (isValidNumber && idx > 0 && idx <= releases.Length)
+                    {
+                        releaseMBID = releases[idx - 1].Mbid;
+                    }
+                }
+            }
+            else if (releases.Count() == 1)
+            {
+                releaseMBID = releases[0].Mbid;
+            }
+            else
+            {
+                releaseMBID = null;
+            }
+
+            ReleaseInfo releaseInfo = 
+                releases.
+                FirstOrDefault(i => i.Mbid.Equals(releaseMBID))
+                ?? (
+                    (releases.Length > 0) ?
+                    releases[0] :
+                    new ReleaseInfo()
+                );
+
+            return releaseInfo;
+        }
+
+
+
+        private void TagFileMusicBrainzIdWithMbid(string file, string recordingMBID, string releaseMBID, string tagmode)
+        {
+            // recording mbid
+            while (String.IsNullOrEmpty(recordingMBID) || recordingMBID.Length != MBID_LENGTH)
+            {
+                Console.WriteLine("Enter a valid recording MBID to find");
+                recordingMBID = Console.ReadLine();
+            }
+
+            // tag fields
+            TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
+
+            MessageDispatcher.PrintTagMode(tagfields);
+
+            TrackInfo trackInfo = null;
+
+            try
+            {
+                trackInfo = musicBrainzUtility.GetRecording(recordingMBID);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            if (trackInfo != null)
+            {
+                // release
+                ReleaseInfo releaseInfo = ReadReleaseInfoIn(releaseMBID, trackInfo.Releases);
+
+                // picture
+                Image picture = MTUtility.ImageFromUri(releaseInfo.ImagePath, proxy);
+
+                ModelTag input = new ModelTag
+                {
+                    Title = trackInfo.Title,
+                    Album = releaseInfo.Title,
+                    AlbumArtists = releaseInfo.Artists != null ? releaseInfo.Artists.Select(a => a.Name).ToArray() : null,
+                    Genres = null,
+                    ArtistMbid = trackInfo.Artists != null ? trackInfo.Artists[0].Mbid : null,
+                    Picture = picture,
+                    ReleaseMbid = releaseInfo.Mbid,
+                    TrackMbid = trackInfo.Mbid,
+                    Position = trackInfo.Track,
+                    Year = GetYearFromDate(releaseInfo.Year),
+                    TrackArtists = trackInfo.Artists != null ? trackInfo.Artists.Select(a => a.Name).ToArray() : null,
+                };
+
+                umTagger.TagFile(file, input, tagfields);
+            }
+            else
+            {
+                Console.WriteLine(String.Format("No recording found for mbid: {0}", recordingMBID));
+            }
+
+            UMTMessage[] messages = umTagger.UnqueueMessages();
+
+            MessageDispatcher.PrintMessages(messages);
+
+        }
+
+        /// <summary>
+        /// TagFileLastfm
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="title"></param>
+        /// <param name="artist"></param>
+        /// <param name="tagmode"></param>
+        private void TagFileLastfm(string file, string title, string artist, string tagmode)
+        {
+            
+            // title
+            while (String.IsNullOrEmpty(title))
+            {
+                Console.WriteLine("Enter title to find");
+                title = Console.ReadLine();
+            }
+
+            // artist
+            while (String.IsNullOrEmpty(artist))
+            {
+                Console.WriteLine("Enter artist to find");
+                artist = Console.ReadLine();
+            }
+
+            // tag fields
+            TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
 
             // start tagging..
             MessageDispatcher.PrintParameters(new ModelTag { AlbumArtists = artist.Split(','), Title = title });
@@ -909,7 +1026,10 @@ namespace UltimateMp3TaggerShell
             string trackArtists = null;
             string title = null;
             string album = null;
+            string recordingMBID = null;
+            string releaseMBID = null;
             string mode = null;
+            string mbrainzMode = null;
             string year = null;
             string trackpos = null;
             string imagepath = null;
@@ -920,6 +1040,8 @@ namespace UltimateMp3TaggerShell
                     v => isHelpRequested = true },                                             
                 { "mode=", "<manual|lastfm|mbrainz>",
                     v => mode = v },
+                { "mbrainzmode=", "<mbid|title>",
+                    v => mbrainzMode = v},
                 { "fields=", "fields to tag (a t T r R y p i g m)",
                     v => tagmode = v },                                       
                 { "rartist=", "album artist name",
@@ -931,7 +1053,11 @@ namespace UltimateMp3TaggerShell
                 { "album=", "album name",
                     v => album = v },   
                 { "title=", "track title",
-                    v => title = v },   
+                    v => title = v },
+                { "recordingMBID=", "recording Music Brainz ID",
+                    v => recordingMBID = v},
+                { "releaseMBID=", "release Music Brainz ID",
+                    v => releaseMBID = v},
                 { "year=", "release year",
                     v => year = v },
                 { "position=", "track position",
@@ -949,6 +1075,15 @@ namespace UltimateMp3TaggerShell
                 Console.WriteLine("Enter a valid mode <manual|lastfm|mbrainz>");
                 mode = Console.ReadLine();
             }
+
+            if (mode.Equals(ModeMBrainz))
+            {
+                while (!validMusicBrainzModes.Contains(mbrainzMode))
+                {
+                    Console.WriteLine("Enter a valid lookup method <mbid|title>");
+                    mbrainzMode = Console.ReadLine();
+                }
+            }
             
             if (!isHelpRequested)
             {
@@ -958,7 +1093,10 @@ namespace UltimateMp3TaggerShell
                         TagFileLastfm(file, title, trackArtists, tagmode);
                         break;
                     case ModeMBrainz:
-                        TagFileMusicBrainzId(file, title, album, tagmode);
+                        if (mbrainzMode.Equals(ModeResourceMbid))
+                            TagFileMusicBrainzIdWithMbid(file, recordingMBID, releaseMBID, tagmode);
+                        else
+                            TagFileMusicBrainzIdWithTitle(file, title, trackArtists, tagmode);
                         break;
                     default:
                         TagFileManually(file, tagmode,
