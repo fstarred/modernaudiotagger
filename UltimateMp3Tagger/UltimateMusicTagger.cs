@@ -206,14 +206,12 @@ namespace UltimateMusicTagger
                 {
                     string oldpath = path;
                     string newpath = Path.Combine(Directory.GetParent(path).FullName, lastFoldernameRenamed);
-                    if (oldpath.Equals(newpath) == false)
-                    {
-                        Directory.Move(oldpath, newpath);
 
-                        queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.INFO, String.Format("new folder name: {0}", lastFoldernameRenamed)));
-                    }
-                    else
-                        queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.WARNING, String.Format("folder name: \"{0}\" already exists", lastFoldernameRenamed)));
+                    Directory.Move(oldpath, newpath);
+
+                    queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.INFO, String.Format("new folder name: {0}", lastFoldernameRenamed)));
+                    
+                    //queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.WARNING, String.Format("folder name: \"{0}\" already exists", lastFoldernameRenamed)));
 
                     lastFoldernameRenamed = newpath;
 
