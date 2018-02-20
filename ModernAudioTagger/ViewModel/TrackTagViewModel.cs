@@ -1,5 +1,5 @@
 ﻿using MicroMvvm;
-using Microsoft.Practices.Unity;
+
 using ModernAudioTagger.BusinessLogic;
 using ModernAudioTagger.Helpers;
 using ModernAudioTagger.Model;
@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using UltimateMusicTagger;
 using UltimateMusicTagger.Model;
+using Unity;
 
 namespace ModernAudioTagger.ViewModel
 {

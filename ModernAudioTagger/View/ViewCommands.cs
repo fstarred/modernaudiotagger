@@ -1,5 +1,4 @@
 ﻿using FirstFloor.ModernUI.Windows.Controls;
-using Microsoft.Practices.Unity;
 using ModernAudioTagger.BusinessLogic;
 using ModernAudioTagger.Model;
 using ModernAudioTagger.Provider;
@@ -10,6 +9,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using Unity;
+using Unity.Injection;
 
 namespace ModernAudioTagger.View
 {

@@ -1,17 +1,14 @@
 ﻿using FirstFloor.ModernUI.Presentation;
-using Microsoft.Practices.Unity;
 using ModernAudioTagger.BusinessLogic;
 using ModernAudioTagger.Provider;
 using ModernUILogViewer.BusinessLogic;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
+using Unity;
 
 namespace ModernAudioTagger.ViewModel
 {

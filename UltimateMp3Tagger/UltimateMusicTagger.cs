@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using TagLib;
 using UltimateMusicTagger.Business;
 using UltimateMusicTagger.Model;
 
@@ -157,7 +155,7 @@ namespace UltimateMusicTagger
 
             mimetype = "taglib/" + ext.ToLower(CultureInfo.InvariantCulture);
 
-            return FileTypes.AvailableTypes.ContainsKey(mimetype);
+            return TagLib.FileTypes.AvailableTypes.ContainsKey(mimetype);
 
         }
 
@@ -206,14 +204,12 @@ namespace UltimateMusicTagger
                 {
                     string oldpath = path;
                     string newpath = Path.Combine(Directory.GetParent(path).FullName, lastFoldernameRenamed);
-                    if (oldpath.Equals(newpath) == false)
-                    {
-                        Directory.Move(oldpath, newpath);
 
-                        queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.INFO, String.Format("new folder name: {0}", lastFoldernameRenamed)));
-                    }
-                    else
-                        queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.WARNING, String.Format("folder name: \"{0}\" already exists", lastFoldernameRenamed)));
+                    Directory.Move(oldpath, newpath);
+
+                    queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.INFO, String.Format("new folder name: {0}", lastFoldernameRenamed)));
+                    
+                    //queueMessage.Enqueue(new UMTMessage(UMTMessage.M_TYPE.WARNING, String.Format("folder name: \"{0}\" already exists", lastFoldernameRenamed)));
 
                     lastFoldernameRenamed = newpath;
 
@@ -740,7 +736,7 @@ namespace UltimateMusicTagger
         }
 
         [Obsolete(null, true)]
-        private Picture GetPictureFromInput(InputTag input)
+        private TagLib.Picture GetPictureFromInput(InputTag input)
         {
             TagLib.Picture picture = null;
 
@@ -767,7 +763,7 @@ namespace UltimateMusicTagger
             {
                 TagLib.File tagFile = TagLib.File.Create(file);
 
-                Tag tag = tagFile.Tag;
+                TagLib.Tag tag = tagFile.Tag;
 
                 ArtistInfo[] artists = new ArtistInfo[tag.Performers.Length];
 
@@ -958,7 +954,7 @@ namespace UltimateMusicTagger
         /// <param name="picture"></param>
         /// <returns></returns>
         [Obsolete("InputTag should not be used", true)]
-        private bool TagFile(string file, InputTag input, TAG_FIELDS mode, Picture picture)
+        private bool TagFile(string file, InputTag input, TAG_FIELDS mode, TagLib.Picture picture)
         {
             if (IsExtensionSupported(file))
             {
@@ -1090,7 +1086,7 @@ namespace UltimateMusicTagger
         {
             //input = FillInputTagFromTrackInfo(input, trackInfo);
 
-            Picture picture = GetPictureFromInput(input);
+            TagLib.Picture picture = GetPictureFromInput(input);
 
             return TagFile(file, input, mode, picture);
         }
