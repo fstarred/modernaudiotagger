@@ -71,7 +71,7 @@ namespace UltimateMp3TaggerShell
             }
             else
             {
-                printAction("\"(%y) %r - %aa", separator, "(year) album - artist");
+                printAction("\"(%y) %r - %aa\"", separator, "(year) album - artist");
             }
             
         }
@@ -208,7 +208,7 @@ namespace UltimateMp3TaggerShell
                     string newfoldername = null;
 
                     umTagger.RenameFolderByTag(input, referenceFile, pattern, out newfoldername);
-
+                    
                     UMTMessage[] messages = umTagger.UnqueueMessages();
 
                     MessageDispatcher.PrintMessages(messages);

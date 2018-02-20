@@ -53,7 +53,7 @@
                 <mui:Link DisplayName="batch helper" Source="/Pages/Batch.xaml" />
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
-        <mui:LinkGroup DisplayName="settings" GroupName="settings">
+        <mui:LinkGroup DisplayName="settings" GroupKey="settings">
             <mui:LinkGroup.Links>
                 <mui:Link DisplayName="software" Source="/Pages/Settings.xaml" />
             </mui:LinkGroup.Links>

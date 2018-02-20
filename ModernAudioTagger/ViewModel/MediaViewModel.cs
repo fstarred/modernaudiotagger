@@ -1,13 +1,9 @@
 ﻿using MicroMvvm;
-using Microsoft.Practices.Unity;
 using ModernAudioTagger.BusinessLogic;
 using ModernAudioTagger.Provider;
 using ModernUILogViewer.BusinessLogic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Input;
+using Unity;
 
 namespace ModernAudioTagger.ViewModel
 {

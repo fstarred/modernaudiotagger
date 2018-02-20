@@ -377,7 +377,7 @@ namespace UltimateMusicTagger.Business
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -407,7 +407,7 @@ namespace UltimateMusicTagger.Business
                 ret = UInt16.Parse(match.Value);
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
