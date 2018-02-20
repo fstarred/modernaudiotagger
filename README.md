@@ -5,9 +5,9 @@ Modern Audio Tagger is a powerful, easy and extreme fast tool to reorganize your
 
 The CLI version can run under Windows, Linux or OsX OS with [mono](http://www.mono-project.com/download/).
 
-| ![ui image](docs/assets/ui.jpg?raw=true "Modern Audio Tagger UI Screenshot") | ![cli image](docs/assets/cli.jpg?raw=true "Ultimate Music Tagger CLI Screenshot") |
-| ----------------------------------- | -------------------------------------- |
-| *Modern Audio Tagger UI Screenshot* | *Ultimate Music Tagger CLI Screenshot* |
+| ![ui image](docs/assets/ui.jpg?raw=true "Modern Audio Tagger UI Screenshot") | ![cli image](docs/assets/cli.jpg?raw=true "Ultimate Music Tagger CLI Screenshot") | ![linux_image](docs/assets/linux_screenshot.png?raw=true "Linux with mono") |
+| ----------------------------------- | -------------------------------------- | -------------------------------------- |
+| *Modern Audio Tagger UI Screenshot* | *Ultimate Music Tagger CLI Screenshot* | *Ultimate Music Tagger under Linux*    |
 
 ### Wiki
 Read the [Guide](https://github.com/fstarred/modernaudiotagger/wiki/Home) for more information about the usage
