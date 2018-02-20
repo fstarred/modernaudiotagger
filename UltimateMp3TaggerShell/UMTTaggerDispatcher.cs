@@ -1276,7 +1276,7 @@ namespace UltimateMp3TaggerShell
                     v => isHelpRequested = true },                                             
                 { "mode=", "<manual|lastfm|mbrainz>",
                     v => mode = v },
-                { "force", "Skip the user from choosing the recording / release from list (always take the first one)",
+                { "force", "Force the first selection avoiding prompt",
                     v => force = true },
                 { "mbrainzmode=", "<mbid|title>",
                     v => mbrainzMode = v},
@@ -1388,7 +1388,7 @@ namespace UltimateMp3TaggerShell
                                 v => recordingMBID = v},
                             { "releaseMBID=", "release Music Brainz ID (search mbid mode only)",
                                 v => releaseMBID = v},
-                            { "force", "Skip the user from choosing the recording / release from list (always take the first one)",
+                            { "force", "Force the first selection avoiding prompt",
                                 v => force = true },
                             };
                         break;
@@ -1451,7 +1451,7 @@ namespace UltimateMp3TaggerShell
                     v => mode = v },
                 { "mbrainzmode=", "<mbid|title>",
                     v => mbrainzMode = v},
-                { "force", "Skip the user from choosing the recording / release from list (always take the first one)",
+                { "force", "Force the first selection avoiding prompt",
                     v => force = true },
                 { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
                     v => tagmode = v },                     
@@ -1566,7 +1566,7 @@ namespace UltimateMp3TaggerShell
                                 v => trackArtists = albumArtists = v },
                             { "releaseMBID=", "release Music Brainz ID (search mbid mode only)",
                                 v => releaseMBID = v},
-                            { "force", "Skip the user from choosing the recording / release from list (always take the first one)",
+                            { "force", "Force the first selection avoiding prompt",
                                 v => force = true },
                         };
 

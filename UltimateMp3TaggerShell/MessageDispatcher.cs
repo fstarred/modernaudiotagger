@@ -65,11 +65,11 @@ namespace UltimateMp3TaggerShell
 
             if ((type & PATTERN_TYPE.FILE) == PATTERN_TYPE.FILE)
             {
-                Console.WriteLine("- File (ex. /music/foo.mp3)");
+                Console.WriteLine("- Single file (ex. /music/foo.mp3)");
             }
             if ((type & PATTERN_TYPE.MULTIPLE_FILES) == PATTERN_TYPE.MULTIPLE_FILES)
             {
-                Console.WriteLine("- More files (ex. /music/*.mp3)");
+                Console.WriteLine("- Many files (ex. /music/*.mp3)");
             }
             if ((type & PATTERN_TYPE.DIRECTORY) == PATTERN_TYPE.DIRECTORY)
             {
