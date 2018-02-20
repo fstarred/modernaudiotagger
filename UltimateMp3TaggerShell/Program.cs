@@ -1,5 +1,4 @@
 ﻿using NDesk.Options;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -276,9 +275,9 @@ namespace UltimateMp3TaggerShell
 
             //try
             //{
-            IConfigSource configSource = new IniConfigSource(Path.Combine(UMTShellUtility.GetPathFromAssembly(System.Reflection.Assembly.GetExecutingAssembly()), "umtagger.ini"));
+            Nini.Config.IConfigSource configSource = new Nini.Config.IniConfigSource(Path.Combine(UMTShellUtility.GetPathFromAssembly(System.Reflection.Assembly.GetExecutingAssembly()), "umtagger.ini"));
 
-            IConfig configSection = configSource.Configs["Proxy"];
+            Nini.Config.IConfig configSection = configSource.Configs["Proxy"];
 
             string enabled = configSection.Get("enable");
 
