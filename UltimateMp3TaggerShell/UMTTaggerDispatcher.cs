@@ -461,7 +461,7 @@ namespace UltimateMp3TaggerShell
         }
 
 
-        private void TagPathMusicBrainzIdWithTitle(string[] files, string album, string artist, string tagmode, char seekmode)
+        private void TagPathMusicBrainzIdWithTitle(string[] files, string album, string artist, string tagmode, char seekmode, bool force)
         {
             // album
             while (String.IsNullOrEmpty(album))
@@ -490,7 +490,10 @@ namespace UltimateMp3TaggerShell
             }
 
             // release
-            ReleaseInfo releaseInfo = ReadInputReleaseInfo(null, releases.ToArray());
+            ReleaseInfo releaseInfo = (!force) ?
+                ReadInputReleaseInfo(null, releases.ToArray()) :
+                releases.FirstOrDefault();
+
 
             // tag fields
             TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
@@ -500,6 +503,9 @@ namespace UltimateMp3TaggerShell
             
             if (releaseInfo != null)
             {
+                // obtain tracks
+                releaseInfo = musicBrainzUtility.GetRelease(releaseInfo.Mbid);
+
                 MessageDispatcher.PrintTagMode(tagfields);
 
                 MessageDispatcher.PrintTrackMatch(filenameMatchMode);
@@ -859,18 +865,17 @@ namespace UltimateMp3TaggerShell
             int idx = 0;
             foreach (TrackInfo track in tracks)
             {
-                Console.WriteLine(String.Format("{0}: {1} - {2} - {3} [{4}]",
+                Console.WriteLine(String.Format("{0}: {1} - {2} - {3}",
                     ++idx,
                     track.Mbid,
                     track.Title,
-                    track.Artists,
-                    track.Length
+                    track.Artists.Select(i => i.Name).FirstOrDefault()                   
                     ));
             }
             Console.Write(Environment.NewLine);
         }
 
-        private void TagFileMusicBrainzIdWithTitle(string file, string title, string artist, string tagmode)
+        private void TagFileMusicBrainzIdWithTitle(string file, string title, string artist, string tagmode, bool force)
         {
             // recording 
             while (String.IsNullOrEmpty(title))
@@ -889,16 +894,18 @@ namespace UltimateMp3TaggerShell
             TAG_FIELDS tagfields = ReadTagModeIn(tagmode);
 
             List<TrackInfo> tracks = musicBrainzUtility.GetRecordingList(title, artist);
-
-            ReadInputTrackInfo(tracks);
-
+            
             if (tracks.Count() > 0)
             {
                 // recording
-                TrackInfo trackInfo = ReadInputTrackInfo(tracks);
+                TrackInfo trackInfo = (!force) ?
+                    ReadInputTrackInfo(tracks) :
+                    tracks[0];
 
                 // release
-                ReleaseInfo releaseInfo = ReadInputReleaseInfo(null, trackInfo.Releases);
+                ReleaseInfo releaseInfo = (!force) ?
+                    ReadInputReleaseInfo(null, trackInfo.Releases) :
+                    trackInfo.Releases.FirstOrDefault();
 
                 // picture
                 Image picture = MTUtility.ImageFromUri(releaseInfo.ImagePath, proxy);
@@ -1058,7 +1065,7 @@ namespace UltimateMp3TaggerShell
 
 
 
-        private void TagFileMusicBrainzIdWithMbid(string file, string recordingMBID, string releaseMBID, string tagmode)
+        private void TagFileMusicBrainzIdWithMbid(string file, string recordingMBID, string releaseMBID, string tagmode, bool force)
         {
             // recording mbid
             while (String.IsNullOrEmpty(recordingMBID) || recordingMBID.Length != MBID_LENGTH)
@@ -1086,7 +1093,10 @@ namespace UltimateMp3TaggerShell
             if (trackInfo != null)
             {
                 // release
-                ReleaseInfo releaseInfo = ReadInputReleaseInfo(releaseMBID, trackInfo.Releases);
+                ReleaseInfo releaseInfo = (!force) ?
+                    ReadInputReleaseInfo(releaseMBID, trackInfo.Releases) :
+                    trackInfo.Releases.FirstOrDefault()
+                    ;
 
                 // picture
                 Image picture = MTUtility.ImageFromUri(releaseInfo.ImagePath, proxy);
@@ -1266,6 +1276,8 @@ namespace UltimateMp3TaggerShell
                     v => isHelpRequested = true },                                             
                 { "mode=", "<manual|lastfm|mbrainz>",
                     v => mode = v },
+                { "force", "Skip the user from choosing the recording / release from list (always take the first one)",
+                    v => force = true },
                 { "mbrainzmode=", "<mbid|title>",
                     v => mbrainzMode = v},
                 { "fields=", "fields to tag (a t T r R y p i g m)",
@@ -1320,9 +1332,9 @@ namespace UltimateMp3TaggerShell
                         break;
                     case ModeMBrainz:
                         if (mbrainzMode.Equals(ModeResourceMbid))
-                            TagFileMusicBrainzIdWithMbid(file, recordingMBID, releaseMBID, tagmode);
+                            TagFileMusicBrainzIdWithMbid(file, recordingMBID, releaseMBID, tagmode, force);
                         else
-                            TagFileMusicBrainzIdWithTitle(file, title, trackArtists, tagmode);
+                            TagFileMusicBrainzIdWithTitle(file, title, trackArtists, tagmode, force);
                         break;
                     default:
                         TagFileManually(file, tagmode,
@@ -1376,9 +1388,11 @@ namespace UltimateMp3TaggerShell
                                 v => recordingMBID = v},
                             { "releaseMBID=", "release Music Brainz ID (search mbid mode only)",
                                 v => releaseMBID = v},
-                        };
+                            { "force", "Skip the user from choosing the recording / release from list (always take the first one)",
+                                v => force = true },
+                            };
                         break;
-                    default:
+                    case ModeManual:
 
                         message = "options for manual mode:";
 
@@ -1403,6 +1417,8 @@ namespace UltimateMp3TaggerShell
                               v => genres = v },
                         };
                         break;
+                    default:
+                        throw new NotImplementedException();                        
                 }
 
                 Console.WriteLine(message);
@@ -1414,6 +1430,7 @@ namespace UltimateMp3TaggerShell
         public void TagPath(string[] args, string input)
         {
             bool isHelpRequested = false;
+            bool force = false;
             string tagmode = null;
             string mode = null;
             string mbrainzMode = null;
@@ -1432,6 +1449,10 @@ namespace UltimateMp3TaggerShell
                     v => isHelpRequested = true },                          
                 { "mode=", "manual / lastfm / musicbrainz <manual|lastfm|mbrainz>",
                     v => mode = v },
+                { "mbrainzmode=", "<mbid|title>",
+                    v => mbrainzMode = v},
+                { "force", "Skip the user from choosing the recording / release from list (always take the first one)",
+                    v => force = true },
                 { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
                     v => tagmode = v },                     
                 { "rartist=", "album artist name",
@@ -1501,7 +1522,7 @@ namespace UltimateMp3TaggerShell
                         if (mbrainzMode.Equals(ModeResourceMbid))
                             TagPathMusicBrainzIdWithMbid(files, releaseMBID, tagmode, match);
                         else
-                            TagPathMusicBrainzIdWithTitle(files, album, trackArtists, tagmode, match);
+                            TagPathMusicBrainzIdWithTitle(files, album, trackArtists, tagmode, match, force);
                         break;
                     case ModeManual:
                         TagPathManually(files, tagmode, album, albumArtists, trackArtists, genres, year, imagepath);
@@ -1534,16 +1555,19 @@ namespace UltimateMp3TaggerShell
                         break;
                     case ModeMBrainz:
                         message = "options for mbrainz mode";
-
                         opt = new OptionSet() {
                             { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
                                 v => tagmode = v },
+                            { "mbrainzmode=", "<mbid|title>",
+                                v => mbrainzMode = v},
                             { "album=", "release name (search title mode only)",
                                 v => album = v },
                             { "artist=", "album/track name (search title mode only)",
                                 v => trackArtists = albumArtists = v },
                             { "releaseMBID=", "release Music Brainz ID (search mbid mode only)",
                                 v => releaseMBID = v},
+                            { "force", "Skip the user from choosing the recording / release from list (always take the first one)",
+                                v => force = true },
                         };
 
                         break;
@@ -1567,8 +1591,7 @@ namespace UltimateMp3TaggerShell
                             };
                         break;
                     default:
-                        message = null;
-                        break;
+                        throw new NotImplementedException();
                 }
 
                 Console.WriteLine(message);
