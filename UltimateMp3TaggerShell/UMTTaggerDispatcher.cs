@@ -1314,17 +1314,17 @@ namespace UltimateMp3TaggerShell
                 mode = Console.ReadLine();
             }
 
-            if (mode.Equals(ModeMBrainz))
-            {
-                while (!validMusicBrainzModes.Contains(mbrainzMode))
-                {
-                    Console.WriteLine("Enter a valid lookup method <mbid|title>");
-                    mbrainzMode = Console.ReadLine();
-                }
-            }
-            
             if (!isHelpRequested)
             {
+                if (mode.Equals(ModeMBrainz))
+                {
+                    while (!validMusicBrainzModes.Contains(mbrainzMode))
+                    {
+                        Console.WriteLine("Enter a valid lookup method <mbid|title>");
+                        mbrainzMode = Console.ReadLine();
+                    }
+                }
+
                 switch (mode)
                 {
                     case ModeLastfm:
@@ -1380,6 +1380,8 @@ namespace UltimateMp3TaggerShell
                         opt = new OptionSet() {
                             { "fields=", "fields to tag (a t T r R y p i g m | ALL)",
                                 v => tagmode = v },
+                            { "mbrainzmode=", "<mbid|title>",
+                                v => mbrainzMode = v},
                             { "album=", "release name (search title mode only)",
                                 v => albumArtists = v },
                             { "title=", "recording title (search title mode only)",
